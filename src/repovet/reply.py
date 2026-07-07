@@ -7,15 +7,17 @@ discipline already lives in each scoring module's evidence strings; this
 module only assembles and labels what's already there — it does not
 generate new claims.
 
-Known scope limit, flagged rather than hidden: S1/S2/S3's evidence strings
-were authored in Chinese from day one (M0/M1), before an English default
-reply was a known requirement. The English reply below reuses those
-strings verbatim — the facts (counts, package/repo names, dates,
-percentages) are legible in either language, but the connecting prose is
-Chinese. Rewriting the evidence corpus to be English-native would touch
-already-accepted M0/M1 code across three modules; that's a real follow-up
-worth doing before `--reply` (English) is used for wide public posting, not
-done here without a separate go-ahead.
+M2.5: S1/S2/S3 evidence is now generated in whichever language the caller
+requested (`compute_s1/s2/s3(..., lang=...)`), so this module's English and
+Chinese renderers are both fully native today — no more mixed-language
+evidence embedded in the English reply (see scoring.py's module docstring
+for how that's done: co-located en/zh strings at every construction site).
+
+S4 (AI-slop hints, v0) is excluded from `--reply` by default — it's the
+highest false-positive-risk signal in the tool and doesn't belong in a
+public post unless explicitly requested via `include_s4=True`
+(`--include-s4` on the CLI). S4 has no score/pattern (hints only), so it
+gets its own rendering block, not folded into the evidence-bullet ranking.
 """
 
 from typing import Any
@@ -54,6 +56,9 @@ _SIGNATURE_ZH = (
     "— 由 repovet 產出（用程式碼驗證、不用感覺判斷的 repo 信任體檢工具）。"
     "這是一個資料點，不是判決。"
 )
+
+_S4_HEADER_EN = "AI-slop hints (S4, v0, experimental -- observations only, not a verdict):"
+_S4_HEADER_ZH = "AI-slop 特徵提示（S4，v0，實驗性——僅為觀察，非判決）："
 
 
 def _evidence_candidates(signals: dict[str, Any]) -> list[tuple[int, str, dict]]:
@@ -103,7 +108,18 @@ def _signal_lines(signals: dict[str, Any], labels: dict[str, str], skipped_word:
     return lines
 
 
-def render_reply_en(record: dict[str, Any]) -> str:
+def _s4_lines(signals: dict[str, Any], header: str) -> list[str]:
+    block = signals.get("s4")
+    if not block or block.get("status") != "ok":
+        return []
+    lines = ["", header]
+    for hint in block["hints"]:
+        lines.append(f"- {hint['name']}: {hint['observation']}")
+        lines.append(f"  ({hint['disclaimer']})")
+    return lines
+
+
+def render_reply_en(record: dict[str, Any], include_s4: bool = False) -> str:
     signals = record["signals"]
     lines = [f"**repovet trust check — {record['target']}**", ""]
     lines.extend(_signal_lines(signals, _LABELS_EN, "skipped"))
@@ -111,6 +127,8 @@ def render_reply_en(record: dict[str, Any]) -> str:
     lines.append("Key evidence:")
     for key, sub in _pick_evidence(signals):
         lines.append(f"- [{key.upper()}] {sub['name']} ({sub['score']}/100): {sub['evidence']}")
+    if include_s4:
+        lines.extend(_s4_lines(signals, _S4_HEADER_EN))
     lines.append("")
     versions = ", ".join(_formula_versions(signals)) or "n/a"
     lines.append(f"Formula versions: {versions}.")
@@ -120,7 +138,7 @@ def render_reply_en(record: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
-def render_reply_zh(record: dict[str, Any]) -> str:
+def render_reply_zh(record: dict[str, Any], include_s4: bool = False) -> str:
     signals = record["signals"]
     lines = [f"**repovet 信任體檢 — {record['target']}**", ""]
     lines.extend(_signal_lines(signals, _LABELS_ZH, "略過"))
@@ -128,6 +146,8 @@ def render_reply_zh(record: dict[str, Any]) -> str:
     lines.append("關鍵證據：")
     for key, sub in _pick_evidence(signals):
         lines.append(f"- [{key.upper()}] {sub['name']}（{sub['score']}/100）：{sub['evidence']}")
+    if include_s4:
+        lines.extend(_s4_lines(signals, _S4_HEADER_ZH))
     lines.append("")
     versions = ", ".join(_formula_versions(signals)) or "n/a"
     lines.append(f"公式版本：{versions}。")
@@ -137,7 +157,7 @@ def render_reply_zh(record: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
-def render_reply(record: dict[str, Any], lang: str = "en") -> str:
+def render_reply(record: dict[str, Any], lang: str = "en", include_s4: bool = False) -> str:
     if lang == "zh":
-        return render_reply_zh(record)
-    return render_reply_en(record)
+        return render_reply_zh(record, include_s4)
+    return render_reply_en(record, include_s4)
