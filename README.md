@@ -4,10 +4,12 @@ Developer trust check for GitHub repos before you depend on them.
 
 `repovet` runs a small set of public, re-runnable checks against a GitHub
 repo and reports 0-100 scores **with evidence for every sub-score** — no
-opaque single number, no LLM in the scoring path. Ships two signals so far:
-**S2** (zombie maintenance, M0) and **S1** (anomalous star pattern, M1). See
-`../research/repovet-mvp-spec-2026-07.md` for the full product spec (S3
-hallucinated deps, S4 AI-slop are future milestones).
+opaque single number, no LLM in the scoring path. Ships three signals so
+far: **S2** (zombie maintenance, M0), **S1** (anomalous star pattern, M1),
+**S3** (hallucinated dependency / slopsquatting, M2) — plus `--reply`, a
+one-command pasteable summary for GitHub issues / HN / Reddit. See
+`../research/repovet-mvp-spec-2026-07.md` for the full product spec (S4
+AI-slop is the remaining future milestone).
 
 ## Install / run
 
@@ -18,7 +20,9 @@ export GITHUB_TOKEN=...   # required for S1 (GraphQL has no anonymous tier)
                           # optional for S2 (60 req/hr anonymous vs 5000 req/hr)
 repovet gh:psf/requests
 repovet gh:psf/requests --json
-repovet --batch targets.txt --json     # one target per line, '#' comments allowed
+repovet gh:psf/requests --reply             # pasteable English summary
+repovet gh:psf/requests --reply --lang zh   # pasteable Traditional Chinese summary
+repovet --batch targets.txt --json          # one target per line, '#' comments allowed
 ```
 
 Without an install, you can also run it as `PYTHONPATH=src python3 -m repovet gh:owner/repo`.
@@ -26,6 +30,14 @@ Without an install, you can also run it as `PYTHONPATH=src python3 -m repovet gh
 Without `GITHUB_TOKEN`, S2 still runs (anonymous REST) but S1 is skipped
 entirely — `signals.s1.status == "skipped"` in `--json`, clearly marked in
 the table view too.
+
+**Gotcha**: `repovet` reads `GITHUB_TOKEN` from the process environment, not
+from any file. If you keep your token in a secrets file and `source` it into
+your shell, that alone does **not** make it visible to `repovet` (or any
+other subprocess) unless the variable is actually exported — sourcing a
+file just sets a shell variable. If `repovet` warns "no GITHUB_TOKEN set"
+right after you sourced your secrets file, run `export GITHUB_TOKEN` (no
+value needed if it's already set in your shell) before invoking `repovet`.
 
 ## Exit codes (pipeline-friendly by design)
 
@@ -161,34 +173,137 @@ is the single biggest known limitation of the current formula.
    same group of accounts coordinating across _many_ repos) needs a
    full star-event graph we don't have in a single-repo query.
 
+## S3 — hallucinated dependency scoring (formula `s3.v1`)
+
+**What it checks**: for every dependency declared in a supported manifest,
+does it actually exist in its registry? A dependency that doesn't exist at
+all is the single most severe, most directly verifiable signal repovet has
+— it's the literal slopsquatting attack surface (an LLM hallucinates an
+import name, someone registers that exact name with malware, the next
+`pip install`/`npm install` grabs it).
+
+**Supported ecosystems (MVP, explicitly limited)**: Python
+(`pyproject.toml`'s PEP 621 `dependencies`/`optional-dependencies` +
+`requirements*.txt`) and JS (`package.json`'s `dependencies`/
+`devDependencies`). Any other ecosystem (Go, Rust, Ruby, ...) reports S3 as
+`skipped: no supported dependency manifest found` rather than guessing.
+
+| Sub-score            | Weight | What it measures                                                                                                                                                                                    |
+| -------------------- | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| dependency existence | 55%    | Fraction of declared dependencies that exist in their registry. **Capped hard** at 40/100 if even one is missing — a hallucinated import shouldn't be diluted away by a big healthy dependency tree |
+| typosquat risk       | 30%    | Fraction of existing dependencies that are name-adjacent (edit distance ≤2) to a well-known package **and** themselves look fresh/low-signal (age <30 days or, npm only, <100 weekly downloads)     |
+| package maturity     | 15%    | Informational: fraction of dependencies younger than 30 days. Being young isn't inherently bad, so this is the lightest-weighted sub-score                                                          |
+
+**Typosquat detection always defers to registry data over string
+similarity.** A real, long-established package that happens to be
+name-adjacent to a popular one (e.g. npm's `request`, a genuine 2011-era
+package) must never be flagged just because an edit-distance check fired —
+only a name-adjacent package that is _also_ young or low-download gets
+flagged. Verified with a unit test using exactly this case.
+
+**Known limitations**:
+
+- The "well-known package" list is a curated ~60-name-per-ecosystem
+  allowlist (`popular_packages.py`), not a live top-N-by-downloads feed —
+  squatting against a popular name that isn't on this list won't be caught.
+- **PyPI packages carry no download-count signal at all.** pypistats.org
+  (the obvious source) 429s on back-to-back requests — verified
+  empirically, unsuitable for checking N dependencies in one run. This is
+  disclosed via a warning in the output, not silently treated as zero.
+- `requirements.txt` `-r other.txt` includes are not followed recursively.
+
+### S3 demo
+
+Against a real healthy repo (`psf/requests`, `--json` excerpt):
+
+```
+S3 hallucinated dependency: 100/100 [clean]
+  dependency existence   100/100  12 個依賴全部存在於對應 registry
+  typosquat risk         100/100  12 個存在依賴，未發現疑似 typosquat 命名
+  package maturity       100/100  12 個已知年齡依賴中 0 個建包 <30 天
+  manifests: pyproject.toml, requirements-dev.txt
+  warning: PyPI packages carry no download-count signal (pypistats API too rate-limited)
+```
+
+Against a self-made fixture (3 real deps checked live against PyPI +
+1 confirmed-nonexistent name + 1 synthetic typosquat-style entry — see
+"why synthetic" note below):
+
+```
+overall: 40/100  pattern: hallucinated-dependency  formula: s3.v1
+  dependency existence      40/100  5 個依賴中 1 個在 registry 查無此套件：zzz-repovet-hallucinated-fixture-test-9f3k2
+  typosquat risk            25/100  4 個存在依賴中 1 個疑似 typosquat：reqeusts（近似 requests，建號 3 天）
+  package maturity          75/100  4 個已知年齡依賴中 1 個建包 <30 天
+```
+
+_Why one entry is synthetic_: finding a **real, currently-existing,
+young/low-download package name that's also a live typosquat attempt**
+would mean deliberately hunting for and then naming an actual attack
+package in a public demo — not something we're going to do. The
+nonexistent-package half of the fixture (the more severe, heavier-weighted
+signal) is 100% real: `zzz-repovet-hallucinated-fixture-test-9f3k2` was
+verified live against the PyPI JSON API (HTTP 404) before use. The
+typosquat half uses a hand-constructed `PackageInfo` fed straight into
+`compute_s3` — the scoring logic itself doesn't care whether the data came
+from a live lookup or not, and this is disclosed here rather than implied
+to be a live finding.
+
+## `--reply`
+
+`repovet gh:owner/repo --reply` renders a neutral, evidence-first summary
+meant to be pasted as-is into a GitHub issue, Hacker News, or Reddit thread
+answering "is this repo legit?" — three signal scores, the 3-5
+lowest-scoring (most decision-relevant) sub-scores as evidence, a one-line
+method/limitations statement, and a tool signature. Never uses accusatory
+language ("anomalous pattern", never "fraud"/"fake") — that discipline
+lives in the underlying evidence strings already; `--reply` only assembles
+what's already there, it doesn't generate new claims. `--reply --lang zh`
+renders the same content in Traditional Chinese.
+
+**Known scope limit, disclosed rather than hidden**: S1/S2/S3's evidence
+strings were authored in Chinese from day one (M0/M1), before an English
+default `--reply` was a known requirement. The English reply reuses those
+evidence strings verbatim — the underlying facts (counts, package/repo
+names, dates, percentages) are legible in either language, but the
+connecting prose is Chinese. The **Chinese** `--reply --lang zh` output is
+therefore the more natively polished of the two today. Rewriting the
+evidence corpus to be English-native would touch already-accepted M0/M1
+code across three modules — a real, reasonable follow-up, not done here
+without a separate go-ahead, since `--reply` (English) being used for wide
+public posting is where this would actually matter.
+
 ## Testing
 
 ```bash
 python3 -m pytest
 ```
 
-All 50 tests mock the GitHub REST and GraphQL APIs (`FakeSession`/
-`FakeResponse` in `tests/conftest.py`) — no real network calls in the test
-suite.
+All 86 tests mock the GitHub REST/GraphQL APIs and the PyPI/npm registry
+APIs (`FakeSession`/`FakeResponse` in `tests/conftest.py`) — no real
+network calls in the test suite.
 
 ## Demo (real API calls, 2026-07-07)
 
 ```
 $ repovet gh:psf/requests
-S2: 86/100 [healthy]      (issue-response 100 real issues answered fast;
-                            PR-response 15 — driveby PR flood, correctly de-weighted)
+S2: 86/100 [healthy]       (issue-response 100 real issues answered fast;
+                             PR-response 15 — driveby PR flood, correctly de-weighted)
 S1: 80/100 [organic-burst] (burst is the repo's 2011 launch day; accounts
-                            in that window are cleaner than baseline, not fakes)
+                             in that window are cleaner than baseline, not fakes)
+S3: 100/100 [clean]        (12 deps, all exist, no typosquat suspects)
 
 $ repovet gh:sidetrip-ai/ici-core   # AI-assistant repo, known 82% fake stars
 S2: 20/100 [anomalous-stalled]      (0/7 issues answered, no activity in 429 days)
 S1: 28/100 [anomalous-star-pattern] (93% of stargazers are throwaway accounts,
                                      concentrated in a 3-day burst)
+S3: skipped (no supported dependency manifest found)
 
 $ repovet gh:moment/moment   # explicitly "maintenance mode" since ~2020
 S2: 80/100 [stable-low-frequency]  (stale cadence, but still triaged)
 ```
 
-The three S2 demo repos (psf/requests, request/request, moment/moment) and
-their full readout are unchanged in spirit from M0 — see git history for the
-original M0 report if you want the request/request numbers too.
+See `--reply` above for the full pasteable-summary demo output (both
+languages), and the S3 section above for the self-made fixture demo. The
+three original S2 demo repos (psf/requests, request/request, moment/moment)
+are unchanged in spirit from M0 — see git history for request/request's
+full numbers.
