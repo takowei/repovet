@@ -4,12 +4,13 @@ Developer trust check for GitHub repos before you depend on them.
 
 `repovet` runs a small set of public, re-runnable checks against a GitHub
 repo and reports 0-100 scores **with evidence for every sub-score** — no
-opaque single number, no LLM in the scoring path. Ships three signals so
-far: **S2** (zombie maintenance, M0), **S1** (anomalous star pattern, M1),
-**S3** (hallucinated dependency / slopsquatting, M2) — plus `--reply`, a
-one-command pasteable summary for GitHub issues / HN / Reddit. See
-`../research/repovet-mvp-spec-2026-07.md` for the full product spec (S4
-AI-slop is the remaining future milestone).
+opaque single number, no LLM in the scoring path. Ships four signals now:
+**S2** (zombie maintenance, M0), **S1** (anomalous star pattern, M1), **S3**
+(hallucinated dependency / slopsquatting, M2), **S4** (AI-slop feature
+hints, v0, M3) — plus `--reply`, a one-command pasteable summary for GitHub
+issues / HN / Reddit, in English or Traditional Chinese
+(`--lang en|zh`, evidence is native in both). See
+`../research/repovet-mvp-spec-2026-07.md` for the full product spec.
 
 ## Install / run
 
@@ -20,10 +21,15 @@ export GITHUB_TOKEN=...   # required for S1 (GraphQL has no anonymous tier)
                           # optional for S2 (60 req/hr anonymous vs 5000 req/hr)
 repovet gh:psf/requests
 repovet gh:psf/requests --json
-repovet gh:psf/requests --reply             # pasteable English summary
-repovet gh:psf/requests --reply --lang zh   # pasteable Traditional Chinese summary
-repovet --batch targets.txt --json          # one target per line, '#' comments allowed
+repovet gh:psf/requests --lang zh                 # same checks, Traditional Chinese evidence
+repovet gh:psf/requests --reply                    # pasteable English summary (S1/S2/S3 only)
+repovet gh:psf/requests --reply --lang zh          # pasteable Traditional Chinese summary
+repovet gh:psf/requests --reply --include-s4       # also include S4's experimental hints
+repovet --batch targets.txt --json                 # one target per line, '#' comments allowed
 ```
+
+`--lang` is a global flag (default `en`): it controls the language of every
+signal's evidence text, not just `--reply`'s wrapper copy.
 
 Without an install, you can also run it as `PYTHONPATH=src python3 -m repovet gh:owner/repo`.
 
@@ -218,9 +224,9 @@ Against a real healthy repo (`psf/requests`, `--json` excerpt):
 
 ```
 S3 hallucinated dependency: 100/100 [clean]
-  dependency existence   100/100  12 個依賴全部存在於對應 registry
-  typosquat risk         100/100  12 個存在依賴，未發現疑似 typosquat 命名
-  package maturity       100/100  12 個已知年齡依賴中 0 個建包 <30 天
+  dependency existence   100/100  all 12 dependencies exist in their registry
+  typosquat risk         100/100  12 existing dependencies checked, no typosquat-like names found
+  package maturity       100/100  0/12 dependencies with known age are <30 days old
   manifests: pyproject.toml, requirements-dev.txt
   warning: PyPI packages carry no download-count signal (pypistats API too rate-limited)
 ```
@@ -231,9 +237,9 @@ Against a self-made fixture (3 real deps checked live against PyPI +
 
 ```
 overall: 40/100  pattern: hallucinated-dependency  formula: s3.v1
-  dependency existence      40/100  5 個依賴中 1 個在 registry 查無此套件：zzz-repovet-hallucinated-fixture-test-9f3k2
-  typosquat risk            25/100  4 個存在依賴中 1 個疑似 typosquat：reqeusts（近似 requests，建號 3 天）
-  package maturity          75/100  4 個已知年齡依賴中 1 個建包 <30 天
+  dependency existence   40/100  1/5 dependencies don't exist in their registry: zzz-repovet-hallucinated-fixture-test-9f3k2
+  typosquat risk         25/100  1/4 existing dependencies look like typosquat candidates: reqeusts (close to requests, 3 days old)
+  package maturity       75/100  1/4 dependencies with known age are <30 days old
 ```
 
 _Why one entry is synthetic_: finding a **real, currently-existing,
@@ -248,29 +254,97 @@ typosquat half uses a hand-constructed `PackageInfo` fed straight into
 from a live lookup or not, and this is disclosed here rather than implied
 to be a live finding.
 
+## S4 — AI-slop feature hints (v0, `formula "s4.v0"`)
+
+**Deliberately not a score.** Unlike S1/S2/S3, S4 has no 0-100 number and
+no `pattern` verdict — per spec, it's the highest false-positive-risk
+signal in the tool (README template similarity, commit-message
+homogeneity, and scaffolding similarity are all things completely
+legitimate, human-run projects exhibit too). v0 emits `signals.s4.hints[]`
+only: each hint is an observation + a raw number + an explicit "this also
+happens in normal repos" disclaimer. No aggregation, no verdict.
+
+| Hint                             | What it measures                                                                                                                                       |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| readme badge density             | Count of shields.io/badge-style images in the README                                                                                                   |
+| README emoji-header density      | Fraction of `#`-headers (outside code fences) containing an emoji                                                                                      |
+| README boilerplate phrase hits   | Count of matches against a curated list of common AI-generated-README phrases                                                                          |
+| commit message length uniformity | Coefficient of variation of the last 30 commit messages' lengths (lower = more uniform); skipped if n<8                                                |
+| repo scaffolding completeness    | Count of common professional-project markers present (LICENSE, CONTRIBUTING.md, CODE_OF_CONDUCT.md, SECURITY.md, issue templates, `.github/workflows`) |
+
+`--reply` **excludes S4 by default** — the riskiest-to-misfire signal
+doesn't belong in a public post unless asked for. Pass `--include-s4` to
+add an "AI-slop hints (experimental)" section to the reply.
+
+### S4 demo — honest result: weak-to-no discriminating power on this pair
+
+Per the spec's own instruction, a v0 signal with near-zero discriminating
+power is an acceptable, honestly-reported outcome — not something to force
+better by cherry-picking a flattering comparison. Ran against a normal repo
+(`psf/requests`) and a suspected-AI-slop repo pulled from S1's calibration
+set (`sidetrip-ai/ici-core`, a small "AI assistant" project):
+
+| Hint                             | psf/requests (normal) | ici-core (suspected AI-slop)     | Discriminates?                                                                   |
+| -------------------------------- | --------------------- | -------------------------------- | -------------------------------------------------------------------------------- |
+| readme badge density             | 5                     | 0                                | **No — wrong direction.** Badges usually mean real CI/PyPI integration, not slop |
+| README emoji-header density      | 0/4 (0%)              | 0/26 (0%)                        | No — both zero                                                                   |
+| README boilerplate phrase hits   | 0/9                   | 1/9 ("we welcome contributions") | Weak, expected direction, thin evidence                                          |
+| commit message length uniformity | CV 0.42               | CV 0.24                          | Weak-to-moderate, expected direction (more uniform)                              |
+| repo scaffolding completeness    | 3 markers             | 3 markers                        | No — tied                                                                        |
+
+**Bottom line**: on this pair, only one hint (commit-message uniformity)
+points weakly in the expected direction; one (badge density) points the
+_opposite_ way of a naive reading (which is exactly why its disclaimer
+exists); the rest don't discriminate at all. This matches the honest
+framing repovet commits to everywhere else: v0 AI-slop hints are things
+for a human to glance at, not a detector. No feature was retuned or
+swapped to make this look better after the fact.
+
+A real bug was found and fixed during this demo, worth naming: naive
+`#`-line counting for headers was inflating ici-core's header count to 60
+by counting bash comments inside ` ``` `-fenced setup snippets as if they
+were markdown headers. Fixed by skipping fenced-code-block lines before
+counting (`_lines_outside_code_fences` in `ai_slop_hints.py`); a regression
+test covers it.
+
 ## `--reply`
 
 `repovet gh:owner/repo --reply` renders a neutral, evidence-first summary
 meant to be pasted as-is into a GitHub issue, Hacker News, or Reddit thread
-answering "is this repo legit?" — three signal scores, the 3-5
-lowest-scoring (most decision-relevant) sub-scores as evidence, a one-line
+answering "is this repo legit?" — S1/S2/S3 scores, the 3-5 lowest-scoring
+(most decision-relevant) sub-scores as evidence, a one-line
 method/limitations statement, and a tool signature. Never uses accusatory
 language ("anomalous pattern", never "fraud"/"fake") — that discipline
 lives in the underlying evidence strings already; `--reply` only assembles
 what's already there, it doesn't generate new claims. `--reply --lang zh`
-renders the same content in Traditional Chinese.
+renders the same content in Traditional Chinese — both are fully
+native today (see M2.5 below). S4 is excluded unless `--include-s4` is
+passed.
 
-**Known scope limit, disclosed rather than hidden**: S1/S2/S3's evidence
-strings were authored in Chinese from day one (M0/M1), before an English
-default `--reply` was a known requirement. The English reply reuses those
-evidence strings verbatim — the underlying facts (counts, package/repo
-names, dates, percentages) are legible in either language, but the
-connecting prose is Chinese. The **Chinese** `--reply --lang zh` output is
-therefore the more natively polished of the two today. Rewriting the
-evidence corpus to be English-native would touch already-accepted M0/M1
-code across three modules — a real, reasonable follow-up, not done here
-without a separate go-ahead, since `--reply` (English) being used for wide
-public posting is where this would actually matter.
+### M2.5: evidence is now English-native (resolved scope gap)
+
+M0-M2 authored all evidence prose in Chinese; the English `--reply`
+therefore embedded Chinese sentences verbatim, which the coordinator
+correctly flagged as a hard blocker before any public posting. Fixed:
+every `score_*` function in `scoring.py`/`star_scoring.py`/
+`dependency_scoring.py`/`ai_slop_hints.py` now takes a `lang: "en" | "zh"`
+parameter (default `"en"`) and builds both language strings **co-located
+at the same construction site** (not in separate files), so a future
+change to the underlying facts can't update one language and silently
+forget the other. `SubScore.name`/`Hint.name` and `pattern` stay
+English-only regardless of `lang` — they're stable identifiers other code
+and tests match against, not prose to localize. Formula versions were not
+bumped (text-only change, no logic/weights/thresholds touched); all
+pre-existing tests kept passing unchanged, plus one new lang-parity test
+per module (same scores/patterns across languages, only the prose differs).
+
+One small residual gap, disclosed rather than silently left: S1's
+top-level `sampling_note` field describing the star-sampling strategy is
+still English-only regardless of `--lang` — it's a collector-level
+metadata field, not one of the per-sub-score evidence strings the
+coordinator's ask was about, but it will look slightly inconsistent in a
+`--lang zh` run. Not fixed here; flagging it rather than letting it look
+accidental.
 
 ## Testing
 
@@ -278,7 +352,7 @@ public posting is where this would actually matter.
 python3 -m pytest
 ```
 
-All 86 tests mock the GitHub REST/GraphQL APIs and the PyPI/npm registry
+All 103 tests mock the GitHub REST/GraphQL APIs and the PyPI/npm registry
 APIs (`FakeSession`/`FakeResponse` in `tests/conftest.py`) — no real
 network calls in the test suite.
 
@@ -291,12 +365,17 @@ S2: 86/100 [healthy]       (issue-response 100 real issues answered fast;
 S1: 80/100 [organic-burst] (burst is the repo's 2011 launch day; accounts
                              in that window are cleaner than baseline, not fakes)
 S3: 100/100 [clean]        (12 deps, all exist, no typosquat suspects)
+S4: 5 badges, 0% emoji headers, 0/9 boilerplate hits, commit-length CV 0.42,
+    3 scaffolding markers (hints only, no verdict)
 
 $ repovet gh:sidetrip-ai/ici-core   # AI-assistant repo, known 82% fake stars
 S2: 20/100 [anomalous-stalled]      (0/7 issues answered, no activity in 429 days)
 S1: 28/100 [anomalous-star-pattern] (93% of stargazers are throwaway accounts,
                                      concentrated in a 3-day burst)
 S3: skipped (no supported dependency manifest found)
+S4: 0 badges, 0% emoji headers, 1/9 boilerplate hits, commit-length CV 0.24,
+    3 scaffolding markers (see S4 section above for the honest "weak
+    discrimination on this pair" read of these numbers)
 
 $ repovet gh:moment/moment   # explicitly "maintenance mode" since ~2020
 S2: 80/100 [stable-low-frequency]  (stale cadence, but still triaged)
