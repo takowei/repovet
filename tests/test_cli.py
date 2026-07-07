@@ -6,7 +6,7 @@ from repovet import cli
 from tests.conftest import FakeResponse, FakeSession, iso
 
 
-def _healthy_repo_responses(n_issues=3):
+def _healthy_repo_responses(n_issues=3, with_manifest_404s=True):
     responses = [
         FakeResponse(200, {"pushed_at": iso(1)}, {"X-RateLimit-Remaining": "100"}),  # repo meta
         FakeResponse(200, [{"published_at": iso(5)}], {"X-RateLimit-Remaining": "99"}),  # releases
@@ -14,6 +14,10 @@ def _healthy_repo_responses(n_issues=3):
     ]
     issues = [{"number": i, "created_at": iso(10), "comments": 0} for i in range(n_issues)]
     responses.append(FakeResponse(200, issues, {"X-RateLimit-Remaining": "97"}))  # issue list
+    if with_manifest_404s:
+        # S3 checks 5 candidate manifest paths via the same rest_client; none
+        # present here -> S3 degrades to "skipped" rather than erroring.
+        responses.extend(FakeResponse(404, {}) for _ in range(5))
     return responses
 
 
@@ -246,3 +250,163 @@ def test_both_target_and_batch_is_input_error(capsys, tmp_path):
 
 def test_neither_target_nor_batch_is_input_error():
     assert cli.main([]) == cli.EXIT_INPUT_ERROR
+
+
+def test_s3_skipped_when_no_manifest_found(monkeypatch, capsys, tmp_path):
+    monkeypatch.setenv("GITHUB_TOKEN", "x")
+
+    def fake_client_ctor(token, cache):
+        from repovet.cache import ResponseCache
+        from repovet.github_client import GitHubClient
+
+        return GitHubClient(
+            token=token,
+            cache=ResponseCache(path=tmp_path / "c.sqlite3"),
+            session=FakeSession(_healthy_repo_responses()),
+        )
+
+    def fake_graphql_ctor(token, cache):
+        from repovet.cache import ResponseCache
+        from repovet.graphql_client import GraphQLClient
+
+        return GraphQLClient(
+            token=token,
+            cache=ResponseCache(path=tmp_path / "gql.sqlite3"),
+            session=FakeSession(_gql_stub_responses()),
+        )
+
+    monkeypatch.setattr(cli, "GitHubClient", fake_client_ctor)
+    monkeypatch.setattr(cli, "GraphQLClient", fake_graphql_ctor)
+    monkeypatch.setattr(cli, "ResponseCache", lambda: None)
+
+    exit_code = cli.main(["gh:acme/lib", "--json"])
+    assert exit_code == cli.EXIT_OK
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["signals"]["s3"]["status"] == "skipped"
+
+
+def test_s3_runs_when_manifest_found(monkeypatch, capsys, tmp_path):
+    import base64
+
+    monkeypatch.setenv("GITHUB_TOKEN", "x")
+
+    pyproject = 'name = "demo"\n[project]\ndependencies = ["requests"]\n'
+    content_response = FakeResponse(
+        200,
+        {
+            "encoding": "base64",
+            "content": base64.b64encode(pyproject.encode()).decode("ascii"),
+        },
+    )
+    responses = _healthy_repo_responses(with_manifest_404s=False)
+    responses += [content_response] + [FakeResponse(404, {}) for _ in range(4)]
+
+    def fake_client_ctor(token, cache):
+        from repovet.cache import ResponseCache
+        from repovet.github_client import GitHubClient
+
+        return GitHubClient(
+            token=token,
+            cache=ResponseCache(path=tmp_path / "c.sqlite3"),
+            session=FakeSession(responses),
+        )
+
+    def fake_graphql_ctor(token, cache):
+        from repovet.cache import ResponseCache
+        from repovet.graphql_client import GraphQLClient
+
+        return GraphQLClient(
+            token=token,
+            cache=ResponseCache(path=tmp_path / "gql.sqlite3"),
+            session=FakeSession(_gql_stub_responses()),
+        )
+
+    def fake_registry_ctor(cache):
+        from repovet.cache import ResponseCache
+        from repovet.registry_client import RegistryClient
+
+        pypi_data = {"releases": {"1.0": [{"upload_time_iso_8601": "2020-01-01T00:00:00Z"}]}}
+        return RegistryClient(
+            cache=ResponseCache(path=tmp_path / "reg.sqlite3"),
+            session=FakeSession([FakeResponse(200, pypi_data)]),
+        )
+
+    monkeypatch.setattr(cli, "GitHubClient", fake_client_ctor)
+    monkeypatch.setattr(cli, "GraphQLClient", fake_graphql_ctor)
+    monkeypatch.setattr(cli, "RegistryClient", fake_registry_ctor)
+    monkeypatch.setattr(cli, "ResponseCache", lambda: None)
+
+    exit_code = cli.main(["gh:acme/lib", "--json"])
+    assert exit_code == cli.EXIT_OK
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["signals"]["s3"]["status"] == "ok"
+    assert payload["signals"]["s3"]["formula_version"] == "s3.v1"
+
+
+def test_reply_flag_renders_reply_not_table_or_json(monkeypatch, capsys, tmp_path):
+    monkeypatch.setenv("GITHUB_TOKEN", "x")
+
+    def fake_client_ctor(token, cache):
+        from repovet.cache import ResponseCache
+        from repovet.github_client import GitHubClient
+
+        return GitHubClient(
+            token=token,
+            cache=ResponseCache(path=tmp_path / "c.sqlite3"),
+            session=FakeSession(_healthy_repo_responses()),
+        )
+
+    def fake_graphql_ctor(token, cache):
+        from repovet.cache import ResponseCache
+        from repovet.graphql_client import GraphQLClient
+
+        return GraphQLClient(
+            token=token,
+            cache=ResponseCache(path=tmp_path / "gql.sqlite3"),
+            session=FakeSession(_gql_stub_responses()),
+        )
+
+    monkeypatch.setattr(cli, "GitHubClient", fake_client_ctor)
+    monkeypatch.setattr(cli, "GraphQLClient", fake_graphql_ctor)
+    monkeypatch.setattr(cli, "ResponseCache", lambda: None)
+
+    exit_code = cli.main(["gh:acme/lib", "--reply"])
+    assert exit_code == cli.EXIT_OK
+    out = capsys.readouterr().out
+    assert "repovet trust check" in out
+    assert "Key evidence:" in out
+    assert "{" not in out  # not JSON
+
+
+def test_reply_lang_zh(monkeypatch, capsys, tmp_path):
+    monkeypatch.setenv("GITHUB_TOKEN", "x")
+
+    def fake_client_ctor(token, cache):
+        from repovet.cache import ResponseCache
+        from repovet.github_client import GitHubClient
+
+        return GitHubClient(
+            token=token,
+            cache=ResponseCache(path=tmp_path / "c.sqlite3"),
+            session=FakeSession(_healthy_repo_responses()),
+        )
+
+    def fake_graphql_ctor(token, cache):
+        from repovet.cache import ResponseCache
+        from repovet.graphql_client import GraphQLClient
+
+        return GraphQLClient(
+            token=token,
+            cache=ResponseCache(path=tmp_path / "gql.sqlite3"),
+            session=FakeSession(_gql_stub_responses()),
+        )
+
+    monkeypatch.setattr(cli, "GitHubClient", fake_client_ctor)
+    monkeypatch.setattr(cli, "GraphQLClient", fake_graphql_ctor)
+    monkeypatch.setattr(cli, "ResponseCache", lambda: None)
+
+    exit_code = cli.main(["gh:acme/lib", "--reply", "--lang", "zh"])
+    assert exit_code == cli.EXIT_OK
+    out = capsys.readouterr().out
+    assert "信任體檢" in out
+    assert "關鍵證據" in out
