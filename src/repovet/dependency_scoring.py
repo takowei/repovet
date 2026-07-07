@@ -22,6 +22,11 @@ similarity alone.
 PyPI has no download-count signal: pypistats.org 429s on back-to-back
 requests (verified empirically), unsuitable for checking many dependencies
 in one run. This is disclosed via a warning, not silently treated as zero.
+
+M2.5: evidence is English-native by default (`lang="en"`), with a
+co-located Traditional Chinese string at every construction site
+(`lang="zh"`) — see scoring.py's module docstring for the rationale.
+`SubScore.name` and `pattern` stay English-only regardless of `lang`.
 """
 
 from dataclasses import dataclass, field
@@ -109,9 +114,14 @@ def _is_typosquat_suspect(pkg: PackageInfo) -> str | None:
     return None
 
 
-def score_existence(packages: list[PackageInfo]) -> SubScore:
+def score_existence(packages: list[PackageInfo], lang: str = "en") -> SubScore:
     if not packages:
-        return SubScore("dependency existence", 70, "無可查驗的依賴（manifest 中沒有宣告任何依賴）")
+        evidence = (
+            "no dependencies to check (manifest declared none)"
+            if lang != "zh"
+            else "無可查驗的依賴（manifest 中沒有宣告任何依賴）"
+        )
+        return SubScore("dependency existence", 70, evidence)
 
     missing = [p for p in packages if not p.exists]
     total = len(packages)
@@ -120,17 +130,32 @@ def score_existence(packages: list[PackageInfo]) -> SubScore:
         score = min(score, EXISTENCE_CAP_IF_ANY_MISSING)
         names = ", ".join(p.name for p in missing[:EVIDENCE_LIST_LIMIT])
         overflow = len(missing) - EVIDENCE_LIST_LIMIT
-        more = f"（其餘 {overflow} 個略）" if overflow > 0 else ""
-        evidence = f"{total} 個依賴中 {len(missing)} 個在 registry 查無此套件：{names}{more}"
+        if lang == "zh":
+            more = f"（其餘 {overflow} 個略）" if overflow > 0 else ""
+            evidence = f"{total} 個依賴中 {len(missing)} 個在 registry 查無此套件：{names}{more}"
+        else:
+            more = f" ({overflow} more omitted)" if overflow > 0 else ""
+            evidence = (
+                f"{len(missing)}/{total} dependencies don't exist in their registry: {names}{more}"
+            )
     else:
-        evidence = f"{total} 個依賴全部存在於對應 registry"
+        evidence = (
+            f"{total} 個依賴全部存在於對應 registry"
+            if lang == "zh"
+            else f"all {total} dependencies exist in their registry"
+        )
     return SubScore("dependency existence", score, evidence)
 
 
-def score_typosquat(packages: list[PackageInfo]) -> SubScore:
+def score_typosquat(packages: list[PackageInfo], lang: str = "en") -> SubScore:
     existing = [p for p in packages if p.exists]
     if not existing:
-        return SubScore("typosquat risk", 70, "無存在的依賴可供比對（預設中性分數）")
+        evidence = (
+            "no existing dependencies to compare (neutral score)"
+            if lang != "zh"
+            else "無存在的依賴可供比對（預設中性分數）"
+        )
+        return SubScore("typosquat risk", 70, evidence)
 
     suspects = [(p, _is_typosquat_suspect(p)) for p in existing]
     suspects = [(p, target) for p, target in suspects if target]
@@ -140,30 +165,62 @@ def score_typosquat(packages: list[PackageInfo]) -> SubScore:
     if suspects:
         parts = []
         for p, target in suspects[:3]:
-            age = f"建號 {p.age_days} 天" if p.age_days is not None else "年齡未知"
-            downloads = f"、週下載 {p.weekly_downloads}" if p.weekly_downloads is not None else ""
-            parts.append(f"{p.name}（近似 {target}，{age}{downloads}）")
-        evidence = (
-            f"{len(existing)} 個存在依賴中 {len(suspects)} 個疑似 typosquat：{'; '.join(parts)}"
-        )
+            if lang == "zh":
+                age = f"建號 {p.age_days} 天" if p.age_days is not None else "年齡未知"
+                downloads = (
+                    f"、週下載 {p.weekly_downloads}" if p.weekly_downloads is not None else ""
+                )
+                parts.append(f"{p.name}（近似 {target}，{age}{downloads}）")
+            else:
+                age = f"{p.age_days} days old" if p.age_days is not None else "age unknown"
+                downloads = (
+                    f", {p.weekly_downloads} weekly downloads"
+                    if p.weekly_downloads is not None
+                    else ""
+                )
+                parts.append(f"{p.name} (close to {target}, {age}{downloads})")
+        if lang == "zh":
+            evidence = (
+                f"{len(existing)} 個存在依賴中 {len(suspects)} 個疑似 typosquat：{'; '.join(parts)}"
+            )
+        else:
+            evidence = (
+                f"{len(suspects)}/{len(existing)} existing dependencies look like typosquat "
+                f"candidates: {'; '.join(parts)}"
+            )
     else:
-        evidence = f"{len(existing)} 個存在依賴，未發現疑似 typosquat 命名"
+        evidence = (
+            f"{len(existing)} 個存在依賴，未發現疑似 typosquat 命名"
+            if lang == "zh"
+            else f"{len(existing)} existing dependencies checked, no typosquat-like names found"
+        )
     return SubScore("typosquat risk", score, evidence)
 
 
-def score_maturity(packages: list[PackageInfo]) -> SubScore:
+def score_maturity(packages: list[PackageInfo], lang: str = "en") -> SubScore:
     existing = [p for p in packages if p.exists]
     known_ages = [p for p in existing if p.age_days is not None]
     if not known_ages:
-        return SubScore("package maturity", 70, "無法取得依賴的套件年齡資訊（預設中性分數）")
+        evidence = (
+            "couldn't determine package age for any dependency (neutral score)"
+            if lang != "zh"
+            else "無法取得依賴的套件年齡資訊（預設中性分數）"
+        )
+        return SubScore("package maturity", 70, evidence)
 
     young = [p for p in known_ages if p.age_days < YOUNG_PACKAGE_DAYS]
     fraction = len(young) / len(known_ages)
     score = round((1 - fraction) * 100)
-    evidence = (
-        f"{len(known_ages)} 個已知年齡依賴中 {len(young)} 個建包 <{YOUNG_PACKAGE_DAYS} 天"
-        "（資訊性訊號，年輕套件不必然有問題）"
-    )
+    if lang == "zh":
+        evidence = (
+            f"{len(known_ages)} 個已知年齡依賴中 {len(young)} 個建包 <{YOUNG_PACKAGE_DAYS} 天"
+            "（資訊性訊號，年輕套件不必然有問題）"
+        )
+    else:
+        evidence = (
+            f"{len(young)}/{len(known_ages)} dependencies with known age are <{YOUNG_PACKAGE_DAYS} "
+            "days old (informational signal only -- a young package isn't inherently a problem)"
+        )
     return SubScore("package maturity", score, evidence)
 
 
@@ -177,11 +234,11 @@ def _classify_pattern(typosquat_score: int, maturity_score: int, any_missing: bo
     return "clean"
 
 
-def compute_s3(raw: RawDependencySignals) -> S3Result:
+def compute_s3(raw: RawDependencySignals, lang: str = "en") -> S3Result:
     packages = raw.packages
-    existence = score_existence(packages)
-    typosquat = score_typosquat(packages)
-    maturity = score_maturity(packages)
+    existence = score_existence(packages, lang)
+    typosquat = score_typosquat(packages, lang)
+    maturity = score_maturity(packages, lang)
 
     overall = round(
         existence.score * WEIGHT_EXISTENCE
