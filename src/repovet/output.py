@@ -26,11 +26,17 @@ NETWORK_ERROR = "network_error"
 _SIGNAL_TITLES = {
     "s2": "S2 zombie-maintenance",
     "s1": "S1 anomalous star pattern",
+    "s3": "S3 hallucinated dependency",
 }
+
+# Result dataclasses can carry one signal-specific extra field beyond the
+# common shape (S1Result.sampling_note, S3Result.manifests_found) -- surface
+# it under its own name in the JSON/table if present, rather than dropping it.
+_EXTRA_FIELDS = ("sampling_note", "manifests_found")
 
 
 def signal_block(result) -> dict[str, Any]:
-    """Serialize a *Result (S1Result or S2Result) into the JSON signal shape."""
+    """Serialize a *Result (S1Result/S2Result/S3Result) into the JSON signal shape."""
     block = {
         "status": OK,
         "formula_version": result.formula_version,
@@ -39,9 +45,10 @@ def signal_block(result) -> dict[str, Any]:
         "sub_scores": [asdict(s) for s in result.sub_scores],
         "warnings": result.warnings,
     }
-    sampling_note = getattr(result, "sampling_note", None)
-    if sampling_note:
-        block["sampling_note"] = sampling_note
+    for field_name in _EXTRA_FIELDS:
+        value = getattr(result, field_name, None)
+        if value:
+            block[field_name] = value
     return block
 
 
@@ -76,6 +83,8 @@ def _render_signal(key: str, block: dict[str, Any]) -> list[str]:
         lines.append(f"  {sub['name']:<28} {sub['score']:>3}/100  {sub['evidence']}")
     if block.get("sampling_note"):
         lines.append(f"  sampling: {block['sampling_note']}")
+    if block.get("manifests_found"):
+        lines.append(f"  manifests: {', '.join(block['manifests_found'])}")
     lines.append(f"  formula: {block['formula_version']}")
     for w in block["warnings"]:
         lines.append(f"  warning: {w}")
