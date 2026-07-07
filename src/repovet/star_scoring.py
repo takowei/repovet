@@ -36,7 +36,13 @@ built up repos/followers will no longer look suspicious to us. This is
 why older campaigns are harder for us to detect than fresh ones.
 
 Score direction matches S2: 100 = no evidence of anomalous star activity,
-0 = strong evidence. Bump FORMULA_VERSION whenever weights/bands change.
+0 = strong evidence. Bump FORMULA_VERSION whenever weights/bands change
+(text-only changes, like M2.5's English-native evidence prose, do not).
+
+M2.5: evidence is English-native by default (`lang="en"`), with a
+co-located Traditional Chinese string at every construction site
+(`lang="zh"`) — see scoring.py's module docstring for the rationale.
+`SubScore.name` and `pattern` stay English-only regardless of `lang`.
 """
 
 from dataclasses import dataclass, field
@@ -119,10 +125,15 @@ def _band_score(value: float, bands: tuple[tuple[float, int], ...], floor: int) 
     return floor
 
 
-def score_account_quality(sample: list[StarSample]) -> SubScore:
+def score_account_quality(sample: list[StarSample], lang: str = "en") -> SubScore:
     n = len(sample)
     if n == 0:
-        return SubScore("account quality", 70, "抽樣中無 star 者可供評估（預設中性分數）")
+        evidence = (
+            "no starrers in the sample to evaluate (neutral score)"
+            if lang != "zh"
+            else "抽樣中無 star 者可供評估（預設中性分數）"
+        )
+        return SubScore("account quality", 70, evidence)
 
     suspicious = [s for s in sample if _is_suspicious(s)]
     zero_repo_n = sum(1 for s in sample if _account_flags(s)[0])
@@ -131,13 +142,22 @@ def score_account_quality(sample: list[StarSample]) -> SubScore:
     fraction = len(suspicious) / n
 
     score = _band_score(fraction, _ACCOUNT_QUALITY_BANDS, _ACCOUNT_QUALITY_FLOOR)
-    evidence = (
-        f"抽樣 {n} 位 star 者中 {len(suspicious)} 位（{fraction:.0%}）符合可疑帳號特徵"
-        f"（zero-repo {zero_repo_n}/{n}、zero-follower {zero_follower_n}/{n}、"
-        f"建號後 {YOUNG_ACCOUNT_DAYS} 天內即 star {young_n}/{n}；需至少符合兩項才算可疑）"
-    )
-    if n < MIN_SAMPLE_FOR_SIGNAL:
-        evidence += f"；樣本數過小（n={n}），信心較低"
+    if lang == "zh":
+        evidence = (
+            f"抽樣 {n} 位 star 者中 {len(suspicious)} 位（{fraction:.0%}）符合可疑帳號特徵"
+            f"（zero-repo {zero_repo_n}/{n}、zero-follower {zero_follower_n}/{n}、"
+            f"建號後 {YOUNG_ACCOUNT_DAYS} 天內即 star {young_n}/{n}；需至少符合兩項才算可疑）"
+        )
+        if n < MIN_SAMPLE_FOR_SIGNAL:
+            evidence += f"；樣本數過小（n={n}），信心較低"
+    else:
+        evidence = (
+            f"{len(suspicious)}/{n} sampled starrers ({fraction:.0%}) match ≥2 suspicious-account "
+            f"flags (zero-repo {zero_repo_n}/{n}, zero-follower {zero_follower_n}/{n}, "
+            f"account created within {YOUNG_ACCOUNT_DAYS} days of starring {young_n}/{n})"
+        )
+        if n < MIN_SAMPLE_FOR_SIGNAL:
+            evidence += f"; sample too small (n={n}), lower confidence"
     return SubScore("account quality", score, evidence)
 
 
@@ -158,13 +178,15 @@ def _max_burst_window(sample_sorted: list[StarSample]) -> tuple[int, int]:
     return best
 
 
-def score_burst(sample: list[StarSample]) -> tuple[SubScore, tuple[int, int]]:
+def score_burst(sample: list[StarSample], lang: str = "en") -> tuple[SubScore, tuple[int, int]]:
     n = len(sample)
     if n < MIN_SAMPLE_FOR_SIGNAL:
-        return (
-            SubScore("star-burst timing", 70, f"樣本數過小（n={n}），無法可靠評估爆量模式"),
-            (0, max(n - 1, 0)),
+        evidence = (
+            f"sample too small (n={n}) to reliably assess burst pattern"
+            if lang != "zh"
+            else f"樣本數過小（n={n}），無法可靠評估爆量模式"
         )
+        return SubScore("star-burst timing", 70, evidence), (0, max(n - 1, 0))
 
     sample_sorted = sorted(sample, key=lambda s: s.starred_at)
     start, end = _max_burst_window(sample_sorted)
@@ -174,35 +196,54 @@ def score_burst(sample: list[StarSample]) -> tuple[SubScore, tuple[int, int]]:
     score = _band_score(fraction, _BURST_BANDS, _BURST_FLOOR)
     window_start = sample_sorted[start].starred_at
     window_end = sample_sorted[end].starred_at
-    evidence = (
-        f"抽樣 {n} 顆 star 中，最密集的 48 小時窗口（{window_start.date()}~{window_end.date()}）"
-        f"內集中了 {window_count} 顆（{fraction:.0%}）"
-    )
+    if lang == "zh":
+        evidence = (
+            f"抽樣 {n} 顆 star 中，最密集的 48 小時窗口"
+            f"（{window_start.date()}~{window_end.date()}）"
+            f"內集中了 {window_count} 顆（{fraction:.0%}）"
+        )
+    else:
+        evidence = (
+            f"of {n} sampled stars, the single busiest 48h window "
+            f"({window_start.date()}~{window_end.date()}) contains {window_count} ({fraction:.0%})"
+        )
     return SubScore("star-burst timing", score, evidence), (start, end)
 
 
-def score_burst_correlation(sample_sorted: list[StarSample], window: tuple[int, int]) -> SubScore:
+def score_burst_correlation(
+    sample_sorted: list[StarSample], window: tuple[int, int], lang: str = "en"
+) -> SubScore:
     n = len(sample_sorted)
     start, end = window
     in_window = sample_sorted[start : end + 1]
     outside = sample_sorted[:start] + sample_sorted[end + 1 :]
 
     if n < MIN_SAMPLE_FOR_SIGNAL or not outside or not in_window:
-        return SubScore(
-            "burst/account correlation",
-            70,
-            "樣本不足以比較爆量窗口內外的帳號品質（預設中性分數）",
+        evidence = (
+            "not enough sample to compare account quality inside vs outside the burst "
+            "window (neutral score)"
+            if lang != "zh"
+            else "樣本不足以比較爆量窗口內外的帳號品質（預設中性分數）"
         )
+        return SubScore("burst/account correlation", 70, evidence)
 
     in_fraction = sum(1 for s in in_window if _is_suspicious(s)) / len(in_window)
     baseline_fraction = sum(1 for s in outside if _is_suspicious(s)) / len(outside)
     delta = in_fraction - baseline_fraction
 
     score = _band_score(max(delta, 0.0), _CORRELATION_BANDS, _CORRELATION_FLOOR)
-    evidence = (
-        f"爆量窗口內可疑帳號比例 {in_fraction:.0%}，窗口外基準比例 {baseline_fraction:.0%}"
-        f"（差距 {delta:+.0%}；差距越大代表爆量與可疑帳號同時發生，越像協同操作而非自然爆紅）"
-    )
+    if lang == "zh":
+        evidence = (
+            f"爆量窗口內可疑帳號比例 {in_fraction:.0%}，窗口外基準比例 {baseline_fraction:.0%}"
+            f"（差距 {delta:+.0%}；差距越大代表爆量與可疑帳號同時發生，越像協同操作而非自然爆紅）"
+        )
+    else:
+        evidence = (
+            f"suspicious-account rate inside the burst window: {in_fraction:.0%}, "
+            f"baseline outside it: {baseline_fraction:.0%} (gap {delta:+.0%}; a bigger gap "
+            "means the burst and the suspicious accounts co-occur, more like coordination "
+            "than organic virality)"
+        )
     return SubScore("burst/account correlation", score, evidence)
 
 
@@ -232,12 +273,12 @@ def _classify_pattern(burst_score: int, account_score: int, correlation_score: i
     return "clean"
 
 
-def compute_s1(raw: RawStarSignals) -> S1Result:
+def compute_s1(raw: RawStarSignals, lang: str = "en") -> S1Result:
     sample = raw.sample
-    account_quality = score_account_quality(sample)
-    burst, window = score_burst(sample)
+    account_quality = score_account_quality(sample, lang)
+    burst, window = score_burst(sample, lang)
     sample_sorted = sorted(sample, key=lambda s: s.starred_at)
-    correlation = score_burst_correlation(sample_sorted, window)
+    correlation = score_burst_correlation(sample_sorted, window, lang)
 
     overall = round(
         burst.score * WEIGHT_BURST

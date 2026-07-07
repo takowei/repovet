@@ -18,9 +18,18 @@ weaker, more ambiguous signal and is weighted lower. The stable-vs-abandoned
 pattern classification now keys off issue responsiveness specifically, not
 the PR-diluted blend.
 
+M2.5: evidence prose is now English-native by default (`lang="en"`), with a
+co-located Traditional Chinese string at every construction site
+(`lang="zh"`) — the two live side by side in the same f-string branch so a
+future change to the underlying facts can't update one language and forget
+the other. `SubScore.name` (the sub-score label, e.g. "bus factor") and
+`pattern` stay English-only regardless of `lang` — they're stable
+identifiers other code/tests match against, not prose to localize.
+
 Thresholds and weights below are fixed at design time (no post-hoc tuning per
-target). Bump FORMULA_VERSION whenever the formula itself changes, so past
---json output stays auditable against the version that produced it.
+target). Bump FORMULA_VERSION whenever the formula itself changes (text-only
+changes, like this one, do not bump it), so past --json output stays
+auditable against the version that produced it.
 """
 
 import statistics
@@ -80,16 +89,13 @@ class S2Result:
     warnings: list[str] = field(default_factory=list)
 
 
-def _days_since(dt: datetime | None, now: datetime) -> int | None:
-    if dt is None:
-        return None
-    return (now - dt).days
-
-
-def score_cadence(last_commit_at, last_release_at, now) -> SubScore:
+def score_cadence(last_commit_at, last_release_at, now, lang: str = "en") -> SubScore:
     candidates = [d for d in (last_commit_at, last_release_at) if d is not None]
     if not candidates:
-        return SubScore("commit/release cadence", _CADENCE_FLOOR, "查無 commit 或 release 紀錄")
+        evidence = (
+            "no commit or release history found" if lang != "zh" else "查無 commit 或 release 紀錄"
+        )
+        return SubScore("commit/release cadence", _CADENCE_FLOOR, evidence)
 
     last_activity = max(candidates)
     days = (now - last_activity).days
@@ -99,19 +105,36 @@ def score_cadence(last_commit_at, last_release_at, now) -> SubScore:
             score = band_score
             break
 
-    if last_commit_at:
-        commit_str = f"{last_commit_at.date()}（{(now - last_commit_at).days}天前）"
+    if lang == "zh":
+        commit_str = (
+            f"{last_commit_at.date()}（{(now - last_commit_at).days}天前）"
+            if last_commit_at
+            else "無紀錄"
+        )
+        release_str = (
+            f"{last_release_at.date()}（{(now - last_release_at).days}天前）"
+            if last_release_at
+            else "無 release 紀錄"
+        )
+        evidence = f"最近 commit {commit_str}；最近 release {release_str}"
     else:
-        commit_str = "無紀錄"
-    if last_release_at:
-        release_str = f"{last_release_at.date()}（{(now - last_release_at).days}天前）"
-    else:
-        release_str = "無 release 紀錄"
-    evidence = f"最近 commit {commit_str}；最近 release {release_str}"
+        commit_str = (
+            f"{last_commit_at.date()} ({(now - last_commit_at).days} days ago)"
+            if last_commit_at
+            else "no record"
+        )
+        release_str = (
+            f"{last_release_at.date()} ({(now - last_release_at).days} days ago)"
+            if last_release_at
+            else "no release on record"
+        )
+        evidence = f"last commit {commit_str}; last release {release_str}"
     return SubScore("commit/release cadence", score, evidence)
 
 
-def _score_responsiveness(sample: list[IssueSample], label: str, noun: str) -> SubScore:
+def _score_responsiveness(
+    sample: list[IssueSample], label: str, noun: str, lang: str = "en"
+) -> SubScore:
     """Shared scoring core for issue-only and PR-only responsiveness. Kept as
     two separate sub-scores (not blended) because their non-response has
     different meaning: an unanswered issue is a real warning sign, an
@@ -119,7 +142,12 @@ def _score_responsiveness(sample: list[IssueSample], label: str, noun: str) -> S
     PRs) — see FORMULA_VERSION history above for why s2.v1 conflated them."""
     sample_size = len(sample)
     if sample_size == 0:
-        return SubScore(label, 70, f"近期無 {noun} 可供抽樣，無法評估回應性（預設中性分數）")
+        evidence = (
+            f"no recent {noun}s available to sample, can't assess responsiveness (neutral score)"
+            if lang != "zh"
+            else f"近期無 {noun} 可供抽樣，無法評估回應性（預設中性分數）"
+        )
+        return SubScore(label, 70, evidence)
 
     responded = [s for s in sample if s.responded_at is not None]
     response_days = [(s.responded_at - s.created_at).days for s in responded]
@@ -134,21 +162,31 @@ def _score_responsiveness(sample: list[IssueSample], label: str, noun: str) -> S
                 break
 
     score = round(min(100, max(0, base)))
-    evidence = f"最近 {sample_size} 個{noun}中 {responded_count} 個獲得回應"
-    if median_days is not None:
-        evidence += f"，首次回應中位數 {median_days:.1f} 天"
+    if lang == "zh":
+        evidence = f"最近 {sample_size} 個{noun}中 {responded_count} 個獲得回應"
+        if median_days is not None:
+            evidence += f"，首次回應中位數 {median_days:.1f} 天"
+    else:
+        evidence = f"{responded_count}/{sample_size} recent {noun}s got a response"
+        if median_days is not None:
+            evidence += f", median first-response time {median_days:.1f} days"
     return SubScore(label, score, evidence)
 
 
-def score_issue_response(issues: list[IssueSample]) -> SubScore:
-    return _score_responsiveness(issues, "issue responsiveness", "issue")
+def score_issue_response(issues: list[IssueSample], lang: str = "en") -> SubScore:
+    return _score_responsiveness(issues, "issue responsiveness", "issue", lang)
 
 
-def score_pr_response(prs: list[IssueSample]) -> SubScore:
-    evidence_note = "可能含未經審核的自動/低品質 PR，非響應不必然代表維護者失聯"
-    sub = _score_responsiveness(prs, "PR responsiveness", "PR")
+def score_pr_response(prs: list[IssueSample], lang: str = "en") -> SubScore:
+    note = (
+        "可能含未經審核的自動/低品質 PR，非響應不必然代表維護者失聯"
+        if lang == "zh"
+        else "may include unreviewed/low-quality driveby PRs; non-response here "
+        "doesn't necessarily mean the maintainer is gone"
+    )
+    sub = _score_responsiveness(prs, "PR responsiveness", "PR", lang)
     if prs:
-        sub.evidence += f"（{evidence_note}）"
+        sub.evidence += f"（{note}）" if lang == "zh" else f" ({note})"
     return sub
 
 
@@ -167,30 +205,42 @@ def _bus_factor(author_counts: dict[str, int]) -> tuple[int, int, int]:
     return factor, len(author_counts), total
 
 
-def score_bus_factor(author_counts: dict[str, int]) -> SubScore:
+def score_bus_factor(author_counts: dict[str, int], lang: str = "en") -> SubScore:
     factor, total_authors, total_commits = _bus_factor(author_counts)
     if total_commits == 0:
-        return SubScore("bus factor", 50, "近一年無 commit 紀錄，無法評估 bus factor")
+        evidence = (
+            "no commits in the past year, can't assess bus factor"
+            if lang != "zh"
+            else "近一年無 commit 紀錄，無法評估 bus factor"
+        )
+        return SubScore("bus factor", 50, evidence)
 
     score = min(100, 40 + factor * 20)
-    evidence = (
-        f"近一年 {total_commits} 筆 commit 中，前 {factor} 位貢獻者即佔 ≥50%"
-        f"（共 {total_authors} 位貢獻者，bus factor={factor}）"
-    )
+    if lang == "zh":
+        evidence = (
+            f"近一年 {total_commits} 筆 commit 中，前 {factor} 位貢獻者即佔 ≥50%"
+            f"（共 {total_authors} 位貢獻者，bus factor={factor}）"
+        )
+    else:
+        evidence = (
+            f"of {total_commits} commits in the past year, the top {factor} contributor(s) "
+            f"already account for ≥50% ({total_authors} total contributors, bus factor={factor})"
+        )
     return SubScore("bus factor", score, evidence)
 
 
-def score_maintainer_activity(raw: RawSignals, now: datetime) -> SubScore:
+def score_maintainer_activity(raw: RawSignals, now: datetime, lang: str = "en") -> SubScore:
     candidates = [raw.last_commit_at, raw.last_release_at]
     candidates.extend(s.responded_at for s in raw.issue_sample if s.responded_at is not None)
     candidates = [c for c in candidates if c is not None]
 
     if not candidates:
-        return SubScore(
-            "maintainer 90d activity",
-            _MAINTAINER_FLOOR,
-            "查無任何可偵測活動（commit、release、issue 回應皆無）",
+        evidence = (
+            "no detectable activity found (no commits, releases, or issue/PR responses)"
+            if lang != "zh"
+            else "查無任何可偵測活動（commit、release、issue 回應皆無）"
         )
+        return SubScore("maintainer 90d activity", _MAINTAINER_FLOOR, evidence)
 
     last_activity = max(candidates)
     days = (now - last_activity).days
@@ -200,7 +250,11 @@ def score_maintainer_activity(raw: RawSignals, now: datetime) -> SubScore:
             score = band_score
             break
 
-    evidence = f"最近一次可偵測活動（commit/release/issue 回應）距今 {days} 天"
+    evidence = (
+        f"最近一次可偵測活動（commit/release/issue 回應）距今 {days} 天"
+        if lang == "zh"
+        else f"most recent detectable activity (commit/release/issue response) was {days} days ago"
+    )
     return SubScore("maintainer 90d activity", score, evidence)
 
 
@@ -212,7 +266,7 @@ def _classify_pattern(issue_score: int, maintainer_score: int, cadence_score: in
     return "mixed"
 
 
-def compute_s2(raw: RawSignals) -> S2Result:
+def compute_s2(raw: RawSignals, lang: str = "en") -> S2Result:
     if raw.fetched_at.tzinfo:
         now = raw.fetched_at.astimezone(timezone.utc)
     else:
@@ -221,11 +275,11 @@ def compute_s2(raw: RawSignals) -> S2Result:
     issues_only = [s for s in raw.issue_sample if not s.is_pr]
     prs_only = [s for s in raw.issue_sample if s.is_pr]
 
-    cadence = score_cadence(raw.last_commit_at, raw.last_release_at, now)
-    issue_response = score_issue_response(issues_only)
-    pr_response = score_pr_response(prs_only)
-    bus_factor = score_bus_factor(raw.author_commit_counts)
-    maintainer = score_maintainer_activity(raw, now)
+    cadence = score_cadence(raw.last_commit_at, raw.last_release_at, now, lang)
+    issue_response = score_issue_response(issues_only, lang)
+    pr_response = score_pr_response(prs_only, lang)
+    bus_factor = score_bus_factor(raw.author_commit_counts, lang)
+    maintainer = score_maintainer_activity(raw, now, lang)
 
     overall = round(
         cadence.score * WEIGHT_CADENCE

@@ -81,3 +81,22 @@ def test_no_dependencies_declared_is_neutral_not_penalized():
 def test_pypi_packages_produce_a_no_download_signal_warning():
     result = compute_s3(_raw([_healthy("requests")]))
     assert any("download" in w for w in result.warnings)
+
+
+def test_evidence_is_english_by_default_and_chinese_on_request():
+    packages = [_healthy(f"realpkg{i}") for i in range(5)]
+    packages.append(PackageInfo(name="xyz-hallucinated", ecosystem="pypi", exists=False))
+
+    en_result = compute_s3(_raw(packages), lang="en")
+    zh_result = compute_s3(_raw(packages), lang="zh")
+
+    existence_en = next(s for s in en_result.sub_scores if s.name == "dependency existence")
+    existence_zh = next(s for s in zh_result.sub_scores if s.name == "dependency existence")
+    assert "don't exist" in existence_en.evidence
+    assert "查無此套件" in existence_zh.evidence
+
+    for en_sub, zh_sub in zip(en_result.sub_scores, zh_result.sub_scores, strict=True):
+        assert en_sub.score == zh_sub.score
+        assert en_sub.name == zh_sub.name
+    assert en_result.overall == zh_result.overall
+    assert en_result.pattern == zh_result.pattern

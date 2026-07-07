@@ -108,3 +108,23 @@ def test_tiny_sample_gets_neutral_scores_not_confident_verdict():
 def test_empty_sample_does_not_crash():
     result = compute_s1(_raw([]))
     assert result.overall >= 0
+
+
+def test_evidence_is_english_by_default_and_chinese_on_request():
+    burst_time = NOW - timedelta(days=60)
+    sample = [_throwaway(burst_time + timedelta(minutes=i)) for i in range(40)]
+    sample += [_real_dev(NOW - timedelta(days=200 + i * 10)) for i in range(10)]
+
+    en_result = compute_s1(_raw(sample), lang="en")
+    zh_result = compute_s1(_raw(sample), lang="zh")
+
+    burst_en = next(s for s in en_result.sub_scores if s.name == "star-burst timing")
+    burst_zh = next(s for s in zh_result.sub_scores if s.name == "star-burst timing")
+    assert "sampled stars" in burst_en.evidence
+    assert "抽樣" in burst_zh.evidence
+
+    for en_sub, zh_sub in zip(en_result.sub_scores, zh_result.sub_scores, strict=True):
+        assert en_sub.score == zh_sub.score
+        assert en_sub.name == zh_sub.name
+    assert en_result.overall == zh_result.overall
+    assert en_result.pattern == zh_result.pattern

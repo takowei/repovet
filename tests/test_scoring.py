@@ -163,3 +163,32 @@ def test_solo_maintainer_bus_factor_evidence_string():
     assert "bus factor=1" in bus_sub.evidence
     # solo maintenance is a risk factor but shouldn't zero the score out
     assert bus_sub.score > 0
+
+
+def test_evidence_is_english_by_default_and_chinese_on_request():
+    raw = RawSignals(
+        owner="acme",
+        repo="lib",
+        fetched_at=NOW,
+        last_commit_at=_days_ago(1),
+        last_release_at=_days_ago(5),
+        author_commit_counts={"solo-dev": 10},
+        commit_sample_count=10,
+        commit_sample_since=_days_ago(365),
+        issue_sample=[_issue(20, response_delay_days=2)],
+        anonymous=False,
+    )
+    en_result = compute_s2(raw, lang="en")
+    zh_result = compute_s2(raw, lang="zh")
+
+    cadence_en = next(s for s in en_result.sub_scores if s.name == "commit/release cadence")
+    cadence_zh = next(s for s in zh_result.sub_scores if s.name == "commit/release cadence")
+    assert "last commit" in cadence_en.evidence
+    assert "最近 commit" in cadence_zh.evidence
+
+    # scores must be identical across languages -- only the prose changes
+    for en_sub, zh_sub in zip(en_result.sub_scores, zh_result.sub_scores, strict=True):
+        assert en_sub.score == zh_sub.score
+        assert en_sub.name == zh_sub.name  # names/labels are never localized
+    assert en_result.overall == zh_result.overall
+    assert en_result.pattern == zh_result.pattern
