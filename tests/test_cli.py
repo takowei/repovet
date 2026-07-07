@@ -6,7 +6,23 @@ from repovet import cli
 from tests.conftest import FakeResponse, FakeSession, iso
 
 
-def _healthy_repo_responses(n_issues=3, with_manifest_404s=True):
+def _manifest_404_responses():
+    # S3 checks 5 candidate manifest paths via the same rest_client; none
+    # present here -> S3 degrades to "skipped" rather than erroring.
+    return [FakeResponse(404, {}) for _ in range(5)]
+
+
+def _slop_stub_responses():
+    # S4 checks 4 README candidates (all 404), then fetches recent commits
+    # and the root directory listing (both empty here).
+    return [
+        *(FakeResponse(404, {}) for _ in range(4)),
+        FakeResponse(200, []),  # commits
+        FakeResponse(200, []),  # root listing (no .github -> no extra call)
+    ]
+
+
+def _healthy_repo_responses(n_issues=3, with_manifest_404s=True, with_slop_404s=True):
     responses = [
         FakeResponse(200, {"pushed_at": iso(1)}, {"X-RateLimit-Remaining": "100"}),  # repo meta
         FakeResponse(200, [{"published_at": iso(5)}], {"X-RateLimit-Remaining": "99"}),  # releases
@@ -15,9 +31,9 @@ def _healthy_repo_responses(n_issues=3, with_manifest_404s=True):
     issues = [{"number": i, "created_at": iso(10), "comments": 0} for i in range(n_issues)]
     responses.append(FakeResponse(200, issues, {"X-RateLimit-Remaining": "97"}))  # issue list
     if with_manifest_404s:
-        # S3 checks 5 candidate manifest paths via the same rest_client; none
-        # present here -> S3 degrades to "skipped" rather than erroring.
-        responses.extend(FakeResponse(404, {}) for _ in range(5))
+        responses.extend(_manifest_404_responses())
+    if with_slop_404s:
+        responses.extend(_slop_stub_responses())
     return responses
 
 
@@ -298,8 +314,9 @@ def test_s3_runs_when_manifest_found(monkeypatch, capsys, tmp_path):
             "content": base64.b64encode(pyproject.encode()).decode("ascii"),
         },
     )
-    responses = _healthy_repo_responses(with_manifest_404s=False)
+    responses = _healthy_repo_responses(with_manifest_404s=False, with_slop_404s=False)
     responses += [content_response] + [FakeResponse(404, {}) for _ in range(4)]
+    responses += _slop_stub_responses()
 
     def fake_client_ctor(token, cache):
         from repovet.cache import ResponseCache
@@ -410,3 +427,69 @@ def test_reply_lang_zh(monkeypatch, capsys, tmp_path):
     out = capsys.readouterr().out
     assert "信任體檢" in out
     assert "關鍵證據" in out
+
+
+def _setup_s4_test_clients(monkeypatch, tmp_path, extra_rest_responses=None):
+    responses = _healthy_repo_responses()
+    if extra_rest_responses:
+        responses = extra_rest_responses
+
+    def fake_client_ctor(token, cache):
+        from repovet.cache import ResponseCache
+        from repovet.github_client import GitHubClient
+
+        return GitHubClient(
+            token=token,
+            cache=ResponseCache(path=tmp_path / "c.sqlite3"),
+            session=FakeSession(responses),
+        )
+
+    def fake_graphql_ctor(token, cache):
+        from repovet.cache import ResponseCache
+        from repovet.graphql_client import GraphQLClient
+
+        return GraphQLClient(
+            token=token,
+            cache=ResponseCache(path=tmp_path / "gql.sqlite3"),
+            session=FakeSession(_gql_stub_responses()),
+        )
+
+    monkeypatch.setattr(cli, "GitHubClient", fake_client_ctor)
+    monkeypatch.setattr(cli, "GraphQLClient", fake_graphql_ctor)
+    monkeypatch.setattr(cli, "ResponseCache", lambda: None)
+
+
+def test_s4_hints_appear_in_json_output(monkeypatch, capsys, tmp_path):
+    monkeypatch.setenv("GITHUB_TOKEN", "x")
+    _setup_s4_test_clients(monkeypatch, tmp_path)
+
+    exit_code = cli.main(["gh:acme/lib", "--json"])
+    assert exit_code == cli.EXIT_OK
+    payload = json.loads(capsys.readouterr().out)
+    s4 = payload["signals"]["s4"]
+    assert s4["status"] == "ok"
+    assert s4["formula_version"] == "s4.v0"
+    assert "hints" in s4
+    assert "overall" not in s4  # v0 constraint: no score
+    assert "pattern" not in s4  # v0 constraint: no verdict
+
+
+def test_s4_excluded_from_reply_by_default(monkeypatch, capsys, tmp_path):
+    monkeypatch.setenv("GITHUB_TOKEN", "x")
+    _setup_s4_test_clients(monkeypatch, tmp_path)
+
+    exit_code = cli.main(["gh:acme/lib", "--reply"])
+    assert exit_code == cli.EXIT_OK
+    out = capsys.readouterr().out
+    assert "AI-slop" not in out
+
+
+def test_s4_included_with_include_s4_flag(monkeypatch, capsys, tmp_path):
+    monkeypatch.setenv("GITHUB_TOKEN", "x")
+    _setup_s4_test_clients(monkeypatch, tmp_path)
+
+    exit_code = cli.main(["gh:acme/lib", "--reply", "--include-s4"])
+    assert exit_code == cli.EXIT_OK
+    out = capsys.readouterr().out
+    assert "AI-slop" in out
+    assert "repo scaffolding completeness" in out

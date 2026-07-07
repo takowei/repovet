@@ -11,6 +11,8 @@ import os
 import sys
 
 from repovet import output
+from repovet.ai_slop_collectors import collect_slop_signals
+from repovet.ai_slop_hints import compute_s4
 from repovet.cache import ResponseCache
 from repovet.collectors import collect_signals
 from repovet.dependency_collectors import collect_dependency_signals
@@ -42,25 +44,32 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--reply", action="store_true", help="render a pasteable reply instead of a table"
     )
-    parser.add_argument("--lang", choices=("en", "zh"), default="en", help="--reply language")
+    parser.add_argument(
+        "--lang", choices=("en", "zh"), default="en", help="evidence/reply language"
+    )
+    parser.add_argument(
+        "--include-s4",
+        action="store_true",
+        help="include S4 AI-slop hints (v0, high false-positive risk) in --reply output",
+    )
     return parser
 
 
-def _run_s1(graphql_client: GraphQLClient | None, target) -> dict:
+def _run_s1(graphql_client: GraphQLClient | None, target, lang: str) -> dict:
     if graphql_client is None:
         return output.signal_unavailable(
             output.SKIPPED, "no GITHUB_TOKEN: S1 needs GraphQL, which has no anonymous tier"
         )
     try:
         raw_star_signals = collect_star_signals(graphql_client, target)
-        return output.signal_block(compute_s1(raw_star_signals))
+        return output.signal_block(compute_s1(raw_star_signals, lang))
     except InputError as e:
         return output.signal_unavailable(output.INPUT_ERROR, str(e))
     except NetworkError as e:
         return output.signal_unavailable(output.NETWORK_ERROR, str(e))
 
 
-def _run_s3(rest_client: GitHubClient, registry_client: RegistryClient, target) -> dict:
+def _run_s3(rest_client: GitHubClient, registry_client: RegistryClient, target, lang: str) -> dict:
     try:
         raw_dep_signals = collect_dependency_signals(rest_client, registry_client, target)
     except InputError as e:
@@ -74,7 +83,17 @@ def _run_s3(rest_client: GitHubClient, registry_client: RegistryClient, target) 
             "no supported dependency manifest found "
             "(checked: pyproject.toml, requirements*.txt, package.json)",
         )
-    return output.signal_block(compute_s3(raw_dep_signals))
+    return output.signal_block(compute_s3(raw_dep_signals, lang))
+
+
+def _run_s4(rest_client: GitHubClient, target, lang: str) -> dict:
+    try:
+        raw_slop_signals = collect_slop_signals(rest_client, target)
+    except InputError as e:
+        return output.signal_unavailable(output.INPUT_ERROR, str(e))
+    except NetworkError as e:
+        return output.signal_unavailable(output.NETWORK_ERROR, str(e))
+    return output.s4_signal_block(compute_s4(raw_slop_signals, lang))
 
 
 def _run_one(
@@ -84,13 +103,14 @@ def _run_one(
     raw_target: str,
     issue_sample: int,
     commit_days: int,
+    lang: str,
 ) -> dict:
     try:
         target = parse_target(raw_target)
         raw_signals = collect_signals(
             rest_client, target, commit_days=commit_days, issue_sample_size=issue_sample
         )
-        s2_result = compute_s2(raw_signals)
+        s2_result = compute_s2(raw_signals, lang)
     except InputError as e:
         return output.error_record(raw_target, output.INPUT_ERROR, str(e))
     except NetworkError as e:
@@ -98,8 +118,9 @@ def _run_one(
 
     signals = {
         "s2": output.signal_block(s2_result),
-        "s1": _run_s1(graphql_client, target),
-        "s3": _run_s3(rest_client, registry_client, target),
+        "s1": _run_s1(graphql_client, target, lang),
+        "s3": _run_s3(rest_client, registry_client, target, lang),
+        "s4": _run_s4(rest_client, target, lang),
     }
     return output.success_record(target, signals)
 
@@ -142,7 +163,13 @@ def main(argv: list[str] | None = None) -> int:
     registry_client = RegistryClient(cache=cache)
     records = [
         _run_one(
-            rest_client, graphql_client, registry_client, t, args.issue_sample, args.commit_days
+            rest_client,
+            graphql_client,
+            registry_client,
+            t,
+            args.issue_sample,
+            args.commit_days,
+            args.lang,
         )
         for t in raw_targets
     ]
@@ -150,7 +177,7 @@ def main(argv: list[str] | None = None) -> int:
     is_batch = bool(args.batch)
     if args.reply:
         replies = [
-            render_reply(r, lang=args.lang)
+            render_reply(r, lang=args.lang, include_s4=args.include_s4)
             if r["status"] == output.OK
             else f"error: {r.get('error')}"
             for r in records

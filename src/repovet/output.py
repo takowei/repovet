@@ -27,6 +27,7 @@ _SIGNAL_TITLES = {
     "s2": "S2 zombie-maintenance",
     "s1": "S1 anomalous star pattern",
     "s3": "S3 hallucinated dependency",
+    "s4": "S4 AI-slop hints (v0, experimental, hints only -- not a verdict)",
 }
 
 # Result dataclasses can carry one signal-specific extra field beyond the
@@ -52,6 +53,17 @@ def signal_block(result) -> dict[str, Any]:
     return block
 
 
+def s4_signal_block(result) -> dict[str, Any]:
+    """S4Result has no overall/pattern (v0 is hints-only, see ai_slop_hints.py) --
+    a distinct shape from signal_block(), not shoehorned into the same one."""
+    return {
+        "status": OK,
+        "formula_version": result.formula_version,
+        "hints": [asdict(h) for h in result.hints],
+        "warnings": result.warnings,
+    }
+
+
 def signal_unavailable(status: str, message: str) -> dict[str, Any]:
     """A signal that couldn't run: status is SKIPPED (opt-in degrade, e.g. no
     token) or INPUT_ERROR/NETWORK_ERROR (this signal specifically failed)."""
@@ -71,12 +83,26 @@ def render_json(records: list[dict[str, Any]], batch: bool) -> str:
     return json.dumps(payload, ensure_ascii=False, indent=2)
 
 
+def _render_hints(title: str, block: dict[str, Any]) -> list[str]:
+    lines = [f"{title}:"]
+    for hint in block["hints"]:
+        lines.append(f"  {hint['name']}: {hint['observation']}")
+        lines.append(f"    disclaimer: {hint['disclaimer']}")
+    lines.append(f"  formula: {block['formula_version']}")
+    for w in block["warnings"]:
+        lines.append(f"  warning: {w}")
+    return lines
+
+
 def _render_signal(key: str, block: dict[str, Any]) -> list[str]:
     title = _SIGNAL_TITLES.get(key, key)
     if block["status"] == SKIPPED:
         return [f"{title}: skipped ({block['message']})"]
     if block["status"] != OK:
         return [f"{title}: ERROR ({block['status']}): {block['message']}"]
+
+    if "hints" in block:
+        return _render_hints(title, block)
 
     lines = [f"{title}: {block['overall']}/100 [{block['pattern']}]"]
     for sub in block["sub_scores"]:
