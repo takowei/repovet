@@ -10,12 +10,16 @@ def _days_ago(n):
     return NOW - timedelta(days=n)
 
 
-def _issue(days_ago_created, response_delay_days=None):
+def _issue(days_ago_created, response_delay_days=None, is_pr=False):
     created = _days_ago(days_ago_created)
     responded = (
         created + timedelta(days=response_delay_days) if response_delay_days is not None else None
     )
-    return IssueSample(number=1, created_at=created, responded_at=responded, is_pr=False)
+    return IssueSample(number=1, created_at=created, responded_at=responded, is_pr=is_pr)
+
+
+def _pr(days_ago_created, response_delay_days=None):
+    return _issue(days_ago_created, response_delay_days, is_pr=True)
 
 
 def test_stable_low_frequency_is_not_flagged_as_zombie():
@@ -76,6 +80,34 @@ def test_active_healthy_repo_scores_high():
     assert result.overall >= 85
 
 
+def test_pr_flood_does_not_drag_down_a_healthy_repo():
+    """Regression test for the psf/requests confound found during M0 demo:
+    a healthy repo whose real issues are answered quickly should not be
+    dragged into 'mixed'/'anomalous' just because most of the recent
+    activity is driveby PRs that get no response."""
+    real_issues = [_issue(20, response_delay_days=1) for _ in range(2)]
+    driveby_prs = [_pr(5) for _ in range(13)]  # never responded, 0 comments
+    raw = RawSignals(
+        owner="acme",
+        repo="popular-lib",
+        fetched_at=NOW,
+        last_commit_at=_days_ago(0),
+        last_release_at=_days_ago(5),
+        author_commit_counts={"a": 10, "b": 8, "c": 7},
+        commit_sample_count=25,
+        commit_sample_since=_days_ago(365),
+        issue_sample=real_issues + driveby_prs,
+        anonymous=False,
+    )
+    result = compute_s2(raw)
+    issue_sub = next(s for s in result.sub_scores if s.name == "issue responsiveness")
+    pr_sub = next(s for s in result.sub_scores if s.name == "PR responsiveness")
+
+    assert issue_sub.score >= 90  # real issues got answered fast
+    assert pr_sub.score < 30  # PR non-response is visible, just weighted low
+    assert result.pattern in ("healthy", "stable-low-frequency")
+
+
 def test_no_issue_sample_gives_neutral_score_not_zero():
     raw = RawSignals(
         owner="acme",
@@ -90,8 +122,10 @@ def test_no_issue_sample_gives_neutral_score_not_zero():
         anonymous=False,
     )
     result = compute_s2(raw)
-    issue_sub = next(s for s in result.sub_scores if s.name == "issue/PR responsiveness")
+    issue_sub = next(s for s in result.sub_scores if s.name == "issue responsiveness")
+    pr_sub = next(s for s in result.sub_scores if s.name == "PR responsiveness")
     assert issue_sub.score == 70
+    assert pr_sub.score == 70
 
 
 def test_anonymous_access_produces_warning():
