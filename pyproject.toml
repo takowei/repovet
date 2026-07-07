@@ -9,6 +9,7 @@ description = "Developer trust check for GitHub repos before you depend on them.
 requires-python = ">=3.10"
 dependencies = [
     "requests>=2.31",
+    "tomli>=2.0; python_version < '3.11'",
 ]
 
 [project.scripts]
