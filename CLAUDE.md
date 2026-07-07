@@ -6,15 +6,16 @@ the scoring path. Spec: `../research/repovet-mvp-spec-2026-07.md`.
 
 ## 狀態（2026-07-07）
 
-M0+M1+M2 done: CLI + S2 (zombie maintenance, s2.v2) + S1 (anomalous star
-pattern, s1.v1) + S3 (hallucinated dependency, s3.v1) + `--reply`
-(`--lang en|zh`). S1 recall miss (older campaigns) is a documented, accepted
-limitation per coordinator ruling — not being fixed now. S3's biggest known
-gap: PyPI has no download-count signal (pypistats API too rate-limited to
-check per-dependency), and typosquat detection uses a curated ~60-name
-allowlist, not a live feed. `--reply` (English) embeds the existing
-Chinese-authored evidence strings verbatim — facts are legible, prose isn't
-English-native; `--reply --lang zh` is the more polished of the two today.
+M0+M1+M2+M2.5+M3 done: CLI + S2 (zombie maintenance, s2.v2) + S1 (anomalous
+star pattern, s1.v1) + S3 (hallucinated dependency, s3.v1) + S4 (AI-slop
+hints, v0, hints-only per spec) + `--reply` (`--lang en|zh`, now fully
+native in both — M2.5 fixed the Chinese-evidence-embedded-in-English-reply
+bug the coordinator flagged as a hard blocker). S1 recall miss (older
+campaigns) is a documented, accepted limitation per coordinator ruling —
+not being fixed. S4's own demo showed honest weak-to-no discriminating
+power on the one pair tested (only commit-message uniformity pointed
+weakly in the expected direction) — reported as-is, not tuned to look
+better, per explicit instruction that this is an acceptable v0 outcome.
 
 ## 技術棧
 
@@ -26,24 +27,26 @@ argparse. ruff lint, pytest 測試（全 mock，不打真網路）.
 ## 關鍵檔案
 
 ```
-src/repovet/cli.py            ← entry point, argparse, exit codes 0/2/3, runs S2+S1+S3, --reply
+src/repovet/cli.py            ← entry point, argparse, exit codes 0/2/3, runs S2+S1+S3+S4, --reply
 src/repovet/targets.py        ← gh:owner/repo parsing, batch file reading
-src/repovet/github_client.py  ← rate-limit-aware REST client (S2+S3's GitHub data source)
+src/repovet/github_client.py  ← rate-limit-aware REST client (S2/S3/S4's GitHub data source)
 src/repovet/graphql_client.py ← rate-limit-aware GraphQL client (S1's data source, needs token)
 src/repovet/registry_client.py← PyPI/npm client for S3 (no rate-limit headers on either registry)
 src/repovet/cache.py          ← sqlite response cache (~/.cache/repovet/), shared by all clients
 src/repovet/collectors.py     ← S2 raw signal gathering (commits/releases/issues)
-src/repovet/scoring.py        ← S2 formula (s2.v2): cadence/issue/PR/bus-factor/maintainer
+src/repovet/scoring.py        ← S2 formula (s2.v2): cadence/issue/PR/bus-factor/maintainer; en/zh evidence
 src/repovet/star_collectors.py← S1 raw signal gathering (stargazers w/ starredAt)
-src/repovet/star_scoring.py   ← S1 formula (s1.v1): burst/account-quality/correlation
+src/repovet/star_scoring.py   ← S1 formula (s1.v1): burst/account-quality/correlation; en/zh evidence
 src/repovet/dependency_manifest.py   ← pyproject.toml/requirements*.txt/package.json parsers
 src/repovet/dependency_collectors.py ← S3 raw signal gathering (manifest fetch + registry checks)
-src/repovet/dependency_scoring.py    ← S3 formula (s3.v1): existence/typosquat/maturity
+src/repovet/dependency_scoring.py    ← S3 formula (s3.v1): existence/typosquat/maturity; en/zh evidence
 src/repovet/popular_packages.py      ← curated allowlist for S3's typosquat check
-src/repovet/reply.py           ← --reply rendering (en/zh)
-src/repovet/output.py          ← table / --json rendering, nested signals.s1/s2/s3
-tests/                         ← pytest, all HTTP fully mocked via conftest.py (86 tests)
-README.md                      ← all three formulas, limitations, calibration, demo, --reply
+src/repovet/ai_slop_collectors.py    ← S4 raw signal gathering (README/commits/dir listings)
+src/repovet/ai_slop_hints.py         ← S4 (v0, hints only, no score/pattern); en/zh observations
+src/repovet/reply.py           ← --reply rendering (en/zh, fully native since M2.5), --include-s4
+src/repovet/output.py          ← table / --json rendering, nested signals.s1/s2/s3/s4
+tests/                         ← pytest, all HTTP fully mocked via conftest.py (103 tests)
+README.md                      ← all four signals, limitations, calibration, demo, --reply, M2.5 note
 ```
 
 ## 目錄結構
@@ -62,13 +65,22 @@ python3 -m pytest
 ruff check src tests
 ruff format src tests
 PYTHONPATH=src python3 -m repovet gh:owner/repo
-PYTHONPATH=src python3 -m repovet gh:owner/repo --reply --lang zh
+PYTHONPATH=src python3 -m repovet gh:owner/repo --lang zh
+PYTHONPATH=src python3 -m repovet gh:owner/repo --reply --include-s4
 ```
 
-## 下一步（M3+，需主對話先決定的事）
+## 語言設計慣例（M2.5 立下的模式，之後加訊號要沿用）
 
-- S4 AI-slop 特徵是原規格最後一個里程碑（v0 只出提示不出分數，誤判風險高）。
-- `--reply`（English）目前嵌入既有中文 evidence 字串——若要對外大量發文
-  (HN/Reddit)，值得考慮把 evidence 語料改成英文原生（會動到已驗收的
-  M0/M1 程式碼），需主對話拍板是否投資。
+每個 `score_*`/hint 產生函式吃 `lang: str = "en"`，en/zh 兩版文字在**同一個
+構造點並列**（不拆檔案），避免未來改事實只改一種語言、另一種漂移。
+`SubScore.name`／`Hint.name`／`pattern` 永遠英文（穩定識別碼，不本地化）。
+
+## 下一步（M3 後，需主對話先決定的事）
+
+- S1 已知最大弱點（只看帳號現在狀態）維持 documented limitation，不修。
+- S1 的 `sampling_note` 欄位仍只有英文（M2.5 沒動到，屬遺留小缺口，已在
+  README 揭露）。
 - 開公開 repo（對外發布）尚未做，遠端與發布仍是主對話/Root 的手。
+- S4 v0 鑑別力弱（見 README「honest result」段）——是否投資做得更準
+  （例如擴大 README 語料、換更好的 baseline 比較對象）需主對話評估
+  投資報酬，目前就照 v0 定位（提示非判決）交付。
