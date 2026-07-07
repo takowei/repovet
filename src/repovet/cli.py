@@ -13,9 +13,13 @@ import sys
 from repovet import output
 from repovet.cache import ResponseCache
 from repovet.collectors import collect_signals
+from repovet.dependency_collectors import collect_dependency_signals
+from repovet.dependency_scoring import compute_s3
 from repovet.errors import InputError, NetworkError
 from repovet.github_client import GitHubClient
 from repovet.graphql_client import GraphQLClient
+from repovet.registry_client import RegistryClient
+from repovet.reply import render_reply
 from repovet.scoring import compute_s2
 from repovet.star_collectors import collect_star_signals
 from repovet.star_scoring import compute_s1
@@ -35,6 +39,10 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--json", action="store_true", help="machine-readable output")
     parser.add_argument("--issue-sample", type=int, default=15, help="issues to sample for S2")
     parser.add_argument("--commit-days", type=int, default=365, help="commit lookback window")
+    parser.add_argument(
+        "--reply", action="store_true", help="render a pasteable reply instead of a table"
+    )
+    parser.add_argument("--lang", choices=("en", "zh"), default="en", help="--reply language")
     return parser
 
 
@@ -52,9 +60,27 @@ def _run_s1(graphql_client: GraphQLClient | None, target) -> dict:
         return output.signal_unavailable(output.NETWORK_ERROR, str(e))
 
 
+def _run_s3(rest_client: GitHubClient, registry_client: RegistryClient, target) -> dict:
+    try:
+        raw_dep_signals = collect_dependency_signals(rest_client, registry_client, target)
+    except InputError as e:
+        return output.signal_unavailable(output.INPUT_ERROR, str(e))
+    except NetworkError as e:
+        return output.signal_unavailable(output.NETWORK_ERROR, str(e))
+
+    if not raw_dep_signals.manifests_found:
+        return output.signal_unavailable(
+            output.SKIPPED,
+            "no supported dependency manifest found "
+            "(checked: pyproject.toml, requirements*.txt, package.json)",
+        )
+    return output.signal_block(compute_s3(raw_dep_signals))
+
+
 def _run_one(
     rest_client: GitHubClient,
     graphql_client: GraphQLClient | None,
+    registry_client: RegistryClient,
     raw_target: str,
     issue_sample: int,
     commit_days: int,
@@ -73,6 +99,7 @@ def _run_one(
     signals = {
         "s2": output.signal_block(s2_result),
         "s1": _run_s1(graphql_client, target),
+        "s3": _run_s3(rest_client, registry_client, target),
     }
     return output.success_record(target, signals)
 
@@ -104,20 +131,32 @@ def main(argv: list[str] | None = None) -> int:
     token = os.environ.get("GITHUB_TOKEN")
     if not token:
         print(
-            "warning: no GITHUB_TOKEN set; S2 runs anonymous (60 req/hr), S1 is skipped entirely",
+            "warning: no GITHUB_TOKEN set; S2/S3 run anonymous (60 req/hr), "
+            "S1 is skipped entirely (GraphQL has no anonymous tier)",
             file=sys.stderr,
         )
 
     cache = ResponseCache()
     rest_client = GitHubClient(token=token, cache=cache)
     graphql_client = GraphQLClient(token=token, cache=cache) if token else None
+    registry_client = RegistryClient(cache=cache)
     records = [
-        _run_one(rest_client, graphql_client, t, args.issue_sample, args.commit_days)
+        _run_one(
+            rest_client, graphql_client, registry_client, t, args.issue_sample, args.commit_days
+        )
         for t in raw_targets
     ]
 
     is_batch = bool(args.batch)
-    if args.json:
+    if args.reply:
+        replies = [
+            render_reply(r, lang=args.lang)
+            if r["status"] == output.OK
+            else f"error: {r.get('error')}"
+            for r in records
+        ]
+        print("\n\n---\n\n".join(replies))
+    elif args.json:
         print(output.render_json(records, batch=is_batch))
     else:
         print(output.render_table(records))
