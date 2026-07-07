@@ -37,6 +37,12 @@ class FakeSession:
             raise AssertionError(f"FakeSession ran out of canned responses for {url}")
         return self._responses.pop(0)
 
+    def post(self, url, headers=None, json=None, timeout=None):
+        self.calls.append((url, json))
+        if not self._responses:
+            raise AssertionError(f"FakeSession ran out of canned responses for {url}")
+        return self._responses.pop(0)
+
 
 def make_client(
     tmp_cache, responses: list[FakeResponse], token: str | None = "fake-token"

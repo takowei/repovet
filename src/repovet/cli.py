@@ -15,7 +15,10 @@ from repovet.cache import ResponseCache
 from repovet.collectors import collect_signals
 from repovet.errors import InputError, NetworkError
 from repovet.github_client import GitHubClient
+from repovet.graphql_client import GraphQLClient
 from repovet.scoring import compute_s2
+from repovet.star_collectors import collect_star_signals
+from repovet.star_scoring import compute_s1
 from repovet.targets import parse_target, read_batch_file
 
 EXIT_OK = 0
@@ -35,18 +38,43 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def _run_one(client: GitHubClient, raw_target: str, issue_sample: int, commit_days: int) -> dict:
+def _run_s1(graphql_client: GraphQLClient | None, target) -> dict:
+    if graphql_client is None:
+        return output.signal_unavailable(
+            output.SKIPPED, "no GITHUB_TOKEN: S1 needs GraphQL, which has no anonymous tier"
+        )
+    try:
+        raw_star_signals = collect_star_signals(graphql_client, target)
+        return output.signal_block(compute_s1(raw_star_signals))
+    except InputError as e:
+        return output.signal_unavailable(output.INPUT_ERROR, str(e))
+    except NetworkError as e:
+        return output.signal_unavailable(output.NETWORK_ERROR, str(e))
+
+
+def _run_one(
+    rest_client: GitHubClient,
+    graphql_client: GraphQLClient | None,
+    raw_target: str,
+    issue_sample: int,
+    commit_days: int,
+) -> dict:
     try:
         target = parse_target(raw_target)
         raw_signals = collect_signals(
-            client, target, commit_days=commit_days, issue_sample_size=issue_sample
+            rest_client, target, commit_days=commit_days, issue_sample_size=issue_sample
         )
-        result = compute_s2(raw_signals)
-        return output.success_record(target, result)
+        s2_result = compute_s2(raw_signals)
     except InputError as e:
         return output.error_record(raw_target, output.INPUT_ERROR, str(e))
     except NetworkError as e:
         return output.error_record(raw_target, output.NETWORK_ERROR, str(e))
+
+    signals = {
+        "s2": output.signal_block(s2_result),
+        "s1": _run_s1(graphql_client, target),
+    }
+    return output.success_record(target, signals)
 
 
 def _exit_code_for(records: list[dict]) -> int:
@@ -75,10 +103,18 @@ def main(argv: list[str] | None = None) -> int:
 
     token = os.environ.get("GITHUB_TOKEN")
     if not token:
-        print("warning: no GITHUB_TOKEN set, running anonymous (60 req/hr)", file=sys.stderr)
+        print(
+            "warning: no GITHUB_TOKEN set; S2 runs anonymous (60 req/hr), S1 is skipped entirely",
+            file=sys.stderr,
+        )
 
-    client = GitHubClient(token=token, cache=ResponseCache())
-    records = [_run_one(client, t, args.issue_sample, args.commit_days) for t in raw_targets]
+    cache = ResponseCache()
+    rest_client = GitHubClient(token=token, cache=cache)
+    graphql_client = GraphQLClient(token=token, cache=cache) if token else None
+    records = [
+        _run_one(rest_client, graphql_client, t, args.issue_sample, args.commit_days)
+        for t in raw_targets
+    ]
 
     is_batch = bool(args.batch)
     if args.json:

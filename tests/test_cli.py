@@ -35,6 +35,25 @@ def patched_client(monkeypatch, tmp_path):
     return fake_get_client, captured
 
 
+def _gql_stub_responses(stargazer_count=0):
+    return [
+        FakeResponse(200, {"data": {"repository": {"stargazerCount": stargazer_count}}}),
+        FakeResponse(
+            200,
+            {
+                "data": {
+                    "repository": {
+                        "stargazers": {
+                            "pageInfo": {"hasNextPage": False, "endCursor": None},
+                            "edges": [],
+                        }
+                    }
+                }
+            },
+        ),
+    ]
+
+
 def test_missing_token_warns_but_still_runs(monkeypatch, capsys, tmp_path):
     monkeypatch.delenv("GITHUB_TOKEN", raising=False)
 
@@ -58,6 +77,80 @@ def test_missing_token_warns_but_still_runs(monkeypatch, capsys, tmp_path):
     assert exit_code == cli.EXIT_OK
     payload = json.loads(captured.out)
     assert payload["status"] == "ok"
+    assert payload["signals"]["s1"]["status"] == "skipped"
+
+
+def test_s1_runs_and_reports_ok_when_token_present(monkeypatch, capsys, tmp_path):
+    monkeypatch.setenv("GITHUB_TOKEN", "x")
+
+    def fake_client_ctor(token, cache):
+        from repovet.cache import ResponseCache
+        from repovet.github_client import GitHubClient
+
+        return GitHubClient(
+            token=token,
+            cache=ResponseCache(path=tmp_path / "c.sqlite3"),
+            session=FakeSession(_healthy_repo_responses()),
+        )
+
+    def fake_graphql_ctor(token, cache):
+        from repovet.cache import ResponseCache
+        from repovet.graphql_client import GraphQLClient
+
+        return GraphQLClient(
+            token=token,
+            cache=ResponseCache(path=tmp_path / "gql.sqlite3"),
+            session=FakeSession(_gql_stub_responses()),
+        )
+
+    monkeypatch.setattr(cli, "GitHubClient", fake_client_ctor)
+    monkeypatch.setattr(cli, "GraphQLClient", fake_graphql_ctor)
+    monkeypatch.setattr(cli, "ResponseCache", lambda: None)
+
+    exit_code = cli.main(["gh:acme/lib", "--json"])
+    assert exit_code == cli.EXIT_OK
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["signals"]["s1"]["status"] == "ok"
+    assert payload["signals"]["s1"]["formula_version"] == "s1.v1"
+
+
+def test_s1_failure_does_not_fail_whole_record(monkeypatch, capsys, tmp_path):
+    monkeypatch.setenv("GITHUB_TOKEN", "x")
+
+    def fake_client_ctor(token, cache):
+        from repovet.cache import ResponseCache
+        from repovet.github_client import GitHubClient
+
+        return GitHubClient(
+            token=token,
+            cache=ResponseCache(path=tmp_path / "c.sqlite3"),
+            session=FakeSession(_healthy_repo_responses()),
+        )
+
+    def fake_graphql_ctor(token, cache):
+        from repovet.cache import ResponseCache
+        from repovet.graphql_client import GraphQLClient
+
+        rate_limited = [
+            FakeResponse(403, {}, {"X-RateLimit-Remaining": "0", "X-RateLimit-Reset": "9999999999"})
+        ]
+        return GraphQLClient(
+            token=token,
+            cache=ResponseCache(path=tmp_path / "gql.sqlite3"),
+            session=FakeSession(rate_limited),
+        )
+
+    monkeypatch.setattr(cli, "GitHubClient", fake_client_ctor)
+    monkeypatch.setattr(cli, "GraphQLClient", fake_graphql_ctor)
+    monkeypatch.setattr(cli, "ResponseCache", lambda: None)
+
+    exit_code = cli.main(["gh:acme/lib", "--json"])
+    # S2 succeeded, so the whole record is still "ok" -- S1's failure is
+    # visible inside signals.s1, but doesn't sink the exit code.
+    assert exit_code == cli.EXIT_OK
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["status"] == "ok"
+    assert payload["signals"]["s1"]["status"] == "network_error"
 
 
 def test_invalid_target_exits_2(monkeypatch, capsys, tmp_path):
@@ -122,7 +215,18 @@ def test_batch_mode_aggregates_worst_exit_code(monkeypatch, capsys, tmp_path):
             session=FakeSession(responses),
         )
 
+    def fake_graphql_ctor(token, cache):
+        from repovet.cache import ResponseCache
+        from repovet.graphql_client import GraphQLClient
+
+        return GraphQLClient(
+            token=token,
+            cache=ResponseCache(path=tmp_path / "gql.sqlite3"),
+            session=FakeSession(_gql_stub_responses()),
+        )
+
     monkeypatch.setattr(cli, "GitHubClient", fake_client_ctor)
+    monkeypatch.setattr(cli, "GraphQLClient", fake_graphql_ctor)
     monkeypatch.setattr(cli, "ResponseCache", lambda: None)
 
     exit_code = cli.main(["--batch", str(batch_file), "--json"])
