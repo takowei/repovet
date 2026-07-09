@@ -1,0 +1,70 @@
+name: repovet reusable watchlist
+
+# Opt-in trigger #2: another repo's OWN maintainer copies a workflow into
+# THEIR OWN repo that calls this reusable workflow (`workflow_call`) on a
+# watchlist file THEY maintain in THEIR OWN repo. repovet never scans or
+# comments on a repo whose maintainer didn't add this themselves.
+#
+# Results are posted as a new issue in the CALLING repo (never a third
+# party's repo, never takowei/repovet), using that repo's own
+# Action-scoped GITHUB_TOKEN. See docs/reusable-watchlist-workflow.md for
+# the copy-paste example a maintainer uses to adopt this.
+on:
+  workflow_call:
+    inputs:
+      watchlist_path:
+        description: "Path (in the calling repo) to a file with one 'gh:owner/repo' target per line"
+        required: false
+        type: string
+        default: ".repovet/watchlist.txt"
+      lang:
+        description: "Reply language: en or zh"
+        required: false
+        type: string
+        default: "en"
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out calling repo (for its watchlist file)
+        uses: actions/checkout@v4
+
+      - name: Check watchlist file exists
+        id: check
+        run: |
+          if [ ! -f "${{ inputs.watchlist_path }}" ]; then
+            echo "::warning::watchlist file ${{ inputs.watchlist_path }} not found -- nothing to scan, skipping"
+            echo "found=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "found=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/setup-python@v5
+        if: steps.check.outputs.found == 'true'
+        with:
+          python-version: "3.11"
+
+      - name: Install repovet
+        if: steps.check.outputs.found == 'true'
+        # Not on PyPI yet -- installed straight from GitHub. Pin to a tag
+        # once repovet starts cutting releases.
+        run: pip install "git+https://github.com/takowei/repovet.git"
+
+      - name: Run repovet on watchlist and post a summary issue
+        if: steps.check.outputs.found == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          REPOVET_WATCHLIST_PATH: ${{ inputs.watchlist_path }}
+          REPOVET_LANG: ${{ inputs.lang }}
+        run: |
+          repovet --batch "$REPOVET_WATCHLIST_PATH" --reply --lang "$REPOVET_LANG" > repovet-watchlist-report.md
+          gh issue create \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "repovet watchlist report ($(date -u +%Y-%m-%d))" \
+            --body-file repovet-watchlist-report.md

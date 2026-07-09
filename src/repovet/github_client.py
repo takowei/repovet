@@ -115,3 +115,43 @@ class GitHubClient:
         data = response.json()
         self.cache.set(cache_key, data)
         return data
+
+    def post(self, path: str, json_body: dict) -> dict:
+        """POST a GitHub API path (e.g. creating an issue comment).
+
+        Not cached -- a POST is a side effect, not an idempotent read. Still
+        goes through the same rate-limit budget check and error mapping as
+        get(), since POSTs share the same primary rate limit.
+        """
+        self._check_budget()
+
+        url = f"{API_BASE}{path}"
+        try:
+            response = self.session.post(
+                url, headers=self._headers(), json=json_body, timeout=REQUEST_TIMEOUT_SECONDS
+            )
+        except requests.exceptions.RequestException as e:
+            raise NetworkError(f"network error calling GitHub API ({path}): {e}") from e
+
+        self._record_rate_limit(response)
+
+        if response.status_code == 404:
+            raise InputError(f"not found on GitHub: {path}")
+
+        if response.status_code in (403, 429):
+            remaining = response.headers.get("X-RateLimit-Remaining")
+            if remaining == "0":
+                reset = response.headers.get("X-RateLimit-Reset")
+                wait_seconds = max(0, int(reset) - int(time.time())) if reset else None
+                hint = f", resets in {wait_seconds}s" if wait_seconds is not None else ""
+                raise NetworkError(f"GitHub rate limit exceeded{hint}")
+            retry_after = response.headers.get("Retry-After")
+            hint = f", retry after {retry_after}s" if retry_after else ""
+            raise NetworkError(f"GitHub secondary rate limit hit{hint}")
+
+        if not response.ok:
+            raise NetworkError(
+                f"GitHub API error {response.status_code} for {path}: {response.text[:200]}"
+            )
+
+        return response.json()

@@ -346,13 +346,49 @@ coordinator's ask was about, but it will look slightly inconsistent in a
 `--lang zh` run. Not fixed here; flagging it rather than letting it look
 accidental.
 
+## Automation / bot
+
+repovet can run as a GitHub Action instead of a manual CLI invocation, in
+two deliberately **opt-in** shapes — there is no path that scans or
+comments on a repo whose maintainer didn't ask for it.
+
+### 1. `/repovet-check` comment bot (this repo)
+
+Comment `/repovet-check gh:owner/repo` on any issue in
+[`takowei/repovet`](https://github.com/takowei/repovet) and a bot replies
+in that same issue with a `--reply`-style summary of `owner/repo`. The
+reply always goes back to the issue where the command was typed — running
+a check on `owner/repo` never causes a comment to be posted _to_
+`owner/repo`. Implemented by
+`.github/workflows/issue-comment-bot.yml` → `src/repovet/bot_cli.py` →
+`src/repovet/bot.py`, using the Action's built-in `GITHUB_TOKEN` (scoped
+to this repo only — no personal PAT involved, nothing for you to manage).
+
+### 2. Reusable watchlist workflow (your repo, your opt-in)
+
+If you want periodic repovet checks on repos/dependencies _you_ care
+about, copy a small workflow into **your own repo** that calls
+`takowei/repovet`'s reusable `workflow_call` workflow on a watchlist file
+you maintain. It scans on your schedule and posts the report as a new
+issue in **your own repo** — again, using your repo's own Action-scoped
+token, and it never reaches into any repo other than the ones you listed.
+Full copy-paste setup: [`docs/reusable-watchlist-workflow.md`](docs/reusable-watchlist-workflow.md).
+
+### Why not "auto-comment on any repo repovet scans"?
+
+Because that's a spam bot and gets you rate-limited/blocked — GitHub is
+the only platform with an accepted automated-comment convention
+(Snyk/Socket-style), and even there it's opt-in-only. Both mechanisms
+above only ever act inside a repo whose own maintainer explicitly invoked
+repovet — never a third party's.
+
 ## Testing
 
 ```bash
 python3 -m pytest
 ```
 
-All 103 tests mock the GitHub REST/GraphQL APIs and the PyPI/npm registry
+All 120 tests mock the GitHub REST/GraphQL APIs and the PyPI/npm registry
 APIs (`FakeSession`/`FakeResponse` in `tests/conftest.py`) — no real
 network calls in the test suite.
 
