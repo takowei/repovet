@@ -62,3 +62,36 @@ def test_network_exception_raises_network_error(tmp_cache):
     client = GitHubClient(token="t", cache=tmp_cache, session=ExplodingSession())
     with pytest.raises(NetworkError):
         client.get("/repos/acme/lib")
+
+
+def test_post_returns_json_and_is_never_cached(tmp_cache):
+    session = FakeSession(
+        [
+            FakeResponse(201, {"id": 1}, {"X-RateLimit-Remaining": "59"}),
+            FakeResponse(201, {"id": 2}, {"X-RateLimit-Remaining": "58"}),
+        ]
+    )
+    client = GitHubClient(token="t", cache=tmp_cache, session=session)
+
+    result1 = client.post("/repos/acme/lib/issues/1/comments", {"body": "hi"})
+    result2 = client.post("/repos/acme/lib/issues/1/comments", {"body": "hi"})
+
+    assert result1 == {"id": 1}
+    assert result2 == {"id": 2}
+    assert len(session.calls) == 2  # no caching on POST, unlike get()
+
+
+def test_post_404_raises_input_error(tmp_cache):
+    session = FakeSession([FakeResponse(404, {}, {})])
+    client = GitHubClient(token="t", cache=tmp_cache, session=session)
+    with pytest.raises(InputError):
+        client.post("/repos/acme/does-not-exist/issues/1/comments", {"body": "hi"})
+
+
+def test_post_rate_limit_raises_network_error(tmp_cache):
+    session = FakeSession(
+        [FakeResponse(403, {}, {"X-RateLimit-Remaining": "0", "X-RateLimit-Reset": "9999999999"})]
+    )
+    client = GitHubClient(token="t", cache=tmp_cache, session=session)
+    with pytest.raises(NetworkError):
+        client.post("/repos/acme/lib/issues/1/comments", {"body": "hi"})

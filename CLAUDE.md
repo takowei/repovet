@@ -4,6 +4,19 @@ Developer trust check for GitHub repos before you depend on them — one-shot
 CLI that scores public, re-runnable trust signals with evidence, no LLM in
 the scoring path. Spec: `../research/repovet-mvp-spec-2026-07.md`.
 
+## 狀態（2026-07-09）
+
+M4 done: GitHub Action automation layer on top of the M0-M3 engine — an
+opt-in `/repovet-check` issue-comment bot in this repo
+(`.github/workflows/issue-comment-bot.yml` → `bot_cli.py` → `bot.py`) and a
+reusable `workflow_call` watchlist workflow other repos can adopt into
+their own repo (`.github/workflows/reusable-watchlist.yml`, doc in
+`docs/reusable-watchlist-workflow.md`). Both paths only ever post inside
+the repo that invoked them — see README "Automation / bot" for the
+full safety design (never comments on a repo that didn't opt in, uses
+only the Action-scoped `GITHUB_TOKEN`, never a personal PAT). 17 new
+tests (120 total).
+
 ## 狀態（2026-07-07）
 
 M0+M1+M2+M2.5+M3 done: CLI + S2 (zombie maintenance, s2.v2) + S1 (anomalous
@@ -45,8 +58,13 @@ src/repovet/ai_slop_collectors.py    ← S4 raw signal gathering (README/commits
 src/repovet/ai_slop_hints.py         ← S4 (v0, hints only, no score/pattern); en/zh observations
 src/repovet/reply.py           ← --reply rendering (en/zh, fully native since M2.5), --include-s4
 src/repovet/output.py          ← table / --json rendering, nested signals.s1/s2/s3/s4
-tests/                         ← pytest, all HTTP fully mocked via conftest.py (103 tests)
-README.md                      ← all four signals, limitations, calibration, demo, --reply, M2.5 note
+src/repovet/bot.py             ← M4: /repovet-check command parsing + comment-posting, opt-in only
+src/repovet/bot_cli.py         ← M4: entry point the issue-comment-bot workflow invokes
+.github/workflows/issue-comment-bot.yml     ← M4: opt-in trigger #1, this repo's issue comments
+.github/workflows/reusable-watchlist.yml    ← M4: opt-in trigger #2, workflow_call for other repos
+docs/reusable-watchlist-workflow.md         ← M4: copy-paste adoption guide for other repos
+tests/                         ← pytest, all HTTP fully mocked via conftest.py (120 tests)
+README.md                      ← all four signals, limitations, calibration, demo, --reply, bot, M2.5 note
 ```
 
 ## 目錄結構

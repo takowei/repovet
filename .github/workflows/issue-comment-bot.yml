@@ -1,0 +1,39 @@
+name: repovet issue-comment bot
+
+# Opt-in trigger #1: a human types `/repovet-check gh:owner/repo` in an
+# issue comment on THIS repo (takowei/repovet). The reply is posted back to
+# that same issue, in this same repo -- this workflow never comments on any
+# other repo. See README "Automation / bot" for the full safety writeup.
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  # Read-only on repo contents (to check out the code), write only on
+  # issues (to post the reply comment). No other scopes. Uses the
+  # Action-managed GITHUB_TOKEN, scoped to this repo only -- never a
+  # personal PAT.
+  contents: read
+  issues: write
+
+jobs:
+  check:
+    if: contains(github.event.comment.body, '/repovet-check')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -e .
+
+      - name: Run repovet bot
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPOVET_ISSUE_NUMBER: ${{ github.event.issue.number }}
+          REPOVET_COMMENT_BODY: ${{ github.event.comment.body }}
+          PYTHONPATH: src
+        run: python -m repovet.bot_cli
