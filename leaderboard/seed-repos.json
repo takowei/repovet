@@ -1,0 +1,70 @@
+{
+  "_meta": {
+    "description": "Fixed seed list for the repovet leaderboard. Selection criteria (documented for transparency, not tuned to produce any particular result): one well-known, widely-used, multi-year-old open source project per primary language, drawn from each project's own public GitHub star count tier. No project was chosen because of a prior belief about its maintenance health or star authenticity -- the list is a cross-section of popular software, not a target list.",
+    "selection_rule": "primary language diversity + at least 3 star-count tiers (mega: 50k+, large: 15k-50k, mid: 3k-15k) + project must be >= 3 years old as of list creation",
+    "created": "2026-07-13",
+    "count_intent": "20-30 repos, small and fixed by design -- not a live GitHub Trending feed"
+  },
+  "repos": [
+    { "target": "gh:torvalds/linux", "language": "C", "tier": "mega" },
+    { "target": "gh:python/cpython", "language": "C/Python", "tier": "mega" },
+    {
+      "target": "gh:microsoft/vscode",
+      "language": "TypeScript",
+      "tier": "mega"
+    },
+    { "target": "gh:facebook/react", "language": "JavaScript", "tier": "mega" },
+    { "target": "gh:vuejs/vue", "language": "JavaScript", "tier": "mega" },
+    {
+      "target": "gh:angular/angular",
+      "language": "TypeScript",
+      "tier": "large"
+    },
+    {
+      "target": "gh:sveltejs/svelte",
+      "language": "JavaScript",
+      "tier": "large"
+    },
+    {
+      "target": "gh:nodejs/node",
+      "language": "JavaScript/C++",
+      "tier": "mega"
+    },
+    {
+      "target": "gh:denoland/deno",
+      "language": "Rust/TypeScript",
+      "tier": "large"
+    },
+    { "target": "gh:golang/go", "language": "Go", "tier": "mega" },
+    { "target": "gh:rust-lang/rust", "language": "Rust", "tier": "mega" },
+    { "target": "gh:django/django", "language": "Python", "tier": "large" },
+    { "target": "gh:pallets/flask", "language": "Python", "tier": "mid" },
+    { "target": "gh:psf/requests", "language": "Python", "tier": "mid" },
+    {
+      "target": "gh:tensorflow/tensorflow",
+      "language": "C++/Python",
+      "tier": "mega"
+    },
+    {
+      "target": "gh:pytorch/pytorch",
+      "language": "Python/C++",
+      "tier": "large"
+    },
+    { "target": "gh:rails/rails", "language": "Ruby", "tier": "large" },
+    { "target": "gh:laravel/laravel", "language": "PHP", "tier": "mid" },
+    {
+      "target": "gh:spring-projects/spring-boot",
+      "language": "Java",
+      "tier": "large"
+    },
+    { "target": "gh:kubernetes/kubernetes", "language": "Go", "tier": "mega" },
+    { "target": "gh:ansible/ansible", "language": "Python", "tier": "large" },
+    { "target": "gh:redis/redis", "language": "C", "tier": "large" },
+    {
+      "target": "gh:elastic/elasticsearch",
+      "language": "Java",
+      "tier": "large"
+    },
+    { "target": "gh:flutter/flutter", "language": "Dart", "tier": "mega" }
+  ]
+}
