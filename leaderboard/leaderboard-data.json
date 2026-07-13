@@ -1,0 +1,2954 @@
+{
+  "generated_at": "2026-07-13T05:36:42.462712+00:00",
+  "seed_file": "seed-repos.json",
+  "repo_count": 24,
+  "elapsed_seconds": 1217.5,
+  "records": [
+    {
+      "status": "ok",
+      "target": "gh:torvalds/linux",
+      "signals": {
+        "s2": {
+          "status": "ok",
+          "formula_version": "s2.v2",
+          "overall": 88,
+          "pattern": "healthy",
+          "sub_scores": [
+            {
+              "name": "commit/release cadence",
+              "score": 100,
+              "evidence": "last commit 2026-07-12 (0 days ago); last release no release on record"
+            },
+            {
+              "name": "issue responsiveness",
+              "score": 70,
+              "evidence": "no recent issues available to sample, can't assess responsiveness (neutral score)"
+            },
+            {
+              "name": "PR responsiveness",
+              "score": 70,
+              "evidence": "no recent PRs available to sample, can't assess responsiveness (neutral score)"
+            },
+            {
+              "name": "bus factor",
+              "score": 100,
+              "evidence": "of 300 commits in the past year, the top 28 contributor(s) already account for ≥50% (154 total contributors, bus factor=28)"
+            },
+            {
+              "name": "maintainer 90d activity",
+              "score": 100,
+              "evidence": "most recent detectable activity (commit/release/issue response) was 0 days ago"
+            }
+          ],
+          "warnings": []
+        },
+        "s1": {
+          "status": "ok",
+          "formula_version": "s1.v1",
+          "overall": 60,
+          "pattern": "organic-burst",
+          "sub_scores": [
+            {
+              "name": "star-burst timing",
+              "score": 25,
+              "evidence": "of 500 sampled stars, the single busiest 48h window (2026-07-10~2026-07-12) contains 262 (52%)"
+            },
+            {
+              "name": "account quality",
+              "score": 85,
+              "evidence": "57/500 sampled starrers (11%) match ≥2 suspicious-account flags (zero-repo 65/500, zero-follower 130/500, account created within 7 days of starring 32/500)"
+            },
+            {
+              "name": "burst/account correlation",
+              "score": 55,
+              "evidence": "suspicious-account rate inside the burst window: 19%, baseline outside it: 3% (gap +17%; a bigger gap means the burst and the suspicious accounts co-occur, more like coordination than organic virality)"
+            }
+          ],
+          "warnings": [],
+          "sampling_note": "stratified sample: most recent 300 + earliest 200 of 239296 total (~0.2% coverage; a campaign buried in the middle of the star history would be missed by this sample)"
+        },
+        "s3": {
+          "status": "skipped",
+          "message": "no supported dependency manifest found (checked: pyproject.toml, requirements*.txt, package.json)"
+        },
+        "s4": {
+          "status": "ok",
+          "formula_version": "s4.v0",
+          "hints": [
+            {
+              "name": "readme badge density",
+              "observation": "0 shields.io/badge-style images found in the README",
+              "raw_value": 0,
+              "disclaimer": "Badge walls are common in professionally maintained projects too (CI/coverage/license badges) -- count alone is not evidence of anything."
+            },
+            {
+              "name": "README emoji-header density",
+              "observation": "0/0 section headers contain an emoji (0%)",
+              "raw_value": 0.0,
+              "disclaimer": "Many human-written READMEs use emoji headers by stylistic choice -- this is common decoration, not a sign of anything."
+            },
+            {
+              "name": "README boilerplate phrase hits",
+              "observation": "0/9 common templated phrases found",
+              "raw_value": 0,
+              "disclaimer": "These phrases are generic boilerplate seen across many legitimately human-written READMEs (including from templates like cookiecutter) -- presence alone proves nothing."
+            },
+            {
+              "name": "commit message length uniformity",
+              "observation": "coefficient of variation of 30 recent commit message lengths: 0.26 (lower = more uniform)",
+              "raw_value": 0.258,
+              "disclaimer": "Low variation can also come from a disciplined team following a strict commit convention (e.g. Conventional Commits) -- this alone doesn't indicate AI-generated commits."
+            },
+            {
+              "name": "repo scaffolding completeness",
+              "observation": "0 common professional-project scaffolding markers present: none",
+              "raw_value": 0,
+              "disclaimer": "A fully scaffolded repo (LICENSE/CONTRIBUTING/CI/issue templates) is completely normal for serious projects -- it is not itself a sign of anything; it's only worth cross-referencing against how young/inactive the repo otherwise looks (see S2)."
+            }
+          ],
+          "warnings": []
+        }
+      },
+      "_seed_meta": {
+        "language": "C",
+        "tier": "mega"
+      }
+    },
+    {
+      "status": "ok",
+      "target": "gh:python/cpython",
+      "signals": {
+        "s2": {
+          "status": "ok",
+          "formula_version": "s2.v2",
+          "overall": 88,
+          "pattern": "healthy",
+          "sub_scores": [
+            {
+              "name": "commit/release cadence",
+              "score": 100,
+              "evidence": "last commit 2026-07-13 (0 days ago); last release no release on record"
+            },
+            {
+              "name": "issue responsiveness",
+              "score": 70,
+              "evidence": "no recent issues available to sample, can't assess responsiveness (neutral score)"
+            },
+            {
+              "name": "PR responsiveness",
+              "score": 70,
+              "evidence": "no recent PRs available to sample, can't assess responsiveness (neutral score)"
+            },
+            {
+              "name": "bus factor",
+              "score": 100,
+              "evidence": "of 300 commits in the past year, the top 4 contributor(s) already account for ≥50% (83 total contributors, bus factor=4)"
+            },
+            {
+              "name": "maintainer 90d activity",
+              "score": 100,
+              "evidence": "most recent detectable activity (commit/release/issue response) was 0 days ago"
+            }
+          ],
+          "warnings": []
+        },
+        "s1": {
+          "status": "ok",
+          "formula_version": "s1.v1",
+          "overall": 70,
+          "pattern": "clean",
+          "sub_scores": [
+            {
+              "name": "star-burst timing",
+              "score": 45,
+              "evidence": "of 500 sampled stars, the single busiest 48h window (2017-02-10~2017-02-11) contains 200 (40%)"
+            },
+            {
+              "name": "account quality",
+              "score": 60,
+              "evidence": "108/500 sampled starrers (22%) match ≥2 suspicious-account flags (zero-repo 74/500, zero-follower 216/500, account created within 7 days of starring 85/500)"
+            },
+            {
+              "name": "burst/account correlation",
+              "score": 100,
+              "evidence": "suspicious-account rate inside the burst window: 0%, baseline outside it: 36% (gap -35%; a bigger gap means the burst and the suspicious accounts co-occur, more like coordination than organic virality)"
+            }
+          ],
+          "warnings": [],
+          "sampling_note": "stratified sample: most recent 300 + earliest 200 of 73772 total (~0.7% coverage; a campaign buried in the middle of the star history would be missed by this sample)"
+        },
+        "s3": {
+          "status": "skipped",
+          "message": "no supported dependency manifest found (checked: pyproject.toml, requirements*.txt, package.json)"
+        },
+        "s4": {
+          "status": "ok",
+          "formula_version": "s4.v0",
+          "hints": [
+            {
+              "name": "readme badge density",
+              "observation": "0 shields.io/badge-style images found in the README",
+              "raw_value": 0,
+              "disclaimer": "Badge walls are common in professionally maintained projects too (CI/coverage/license badges) -- count alone is not evidence of anything."
+            },
+            {
+              "name": "README emoji-header density",
+              "observation": "0/0 section headers contain an emoji (0%)",
+              "raw_value": 0.0,
+              "disclaimer": "Many human-written READMEs use emoji headers by stylistic choice -- this is common decoration, not a sign of anything."
+            },
+            {
+              "name": "README boilerplate phrase hits",
+              "observation": "0/9 common templated phrases found",
+              "raw_value": 0,
+              "disclaimer": "These phrases are generic boilerplate seen across many legitimately human-written READMEs (including from templates like cookiecutter) -- presence alone proves nothing."
+            },
+            {
+              "name": "commit message length uniformity",
+              "observation": "coefficient of variation of 30 recent commit message lengths: 0.19 (lower = more uniform)",
+              "raw_value": 0.19,
+              "disclaimer": "Low variation can also come from a disciplined team following a strict commit convention (e.g. Conventional Commits) -- this alone doesn't indicate AI-generated commits."
+            },
+            {
+              "name": "repo scaffolding completeness",
+              "observation": "3 common professional-project scaffolding markers present: LICENSE, issue templates, .github/workflows",
+              "raw_value": 3,
+              "disclaimer": "A fully scaffolded repo (LICENSE/CONTRIBUTING/CI/issue templates) is completely normal for serious projects -- it is not itself a sign of anything; it's only worth cross-referencing against how young/inactive the repo otherwise looks (see S2)."
+            }
+          ],
+          "warnings": []
+        }
+      },
+      "_seed_meta": {
+        "language": "C/Python",
+        "tier": "mega"
+      }
+    },
+    {
+      "status": "ok",
+      "target": "gh:microsoft/vscode",
+      "signals": {
+        "s2": {
+          "status": "ok",
+          "formula_version": "s2.v2",
+          "overall": 88,
+          "pattern": "healthy",
+          "sub_scores": [
+            {
+              "name": "commit/release cadence",
+              "score": 100,
+              "evidence": "last commit 2026-07-13 (0 days ago); last release 2026-07-08 (4 days ago)"
+            },
+            {
+              "name": "issue responsiveness",
+              "score": 70,
+              "evidence": "no recent issues available to sample, can't assess responsiveness (neutral score)"
+            },
+            {
+              "name": "PR responsiveness",
+              "score": 70,
+              "evidence": "no recent PRs available to sample, can't assess responsiveness (neutral score)"
+            },
+            {
+              "name": "bus factor",
+              "score": 100,
+              "evidence": "of 300 commits in the past year, the top 7 contributor(s) already account for ≥50% (42 total contributors, bus factor=7)"
+            },
+            {
+              "name": "maintainer 90d activity",
+              "score": 100,
+              "evidence": "most recent detectable activity (commit/release/issue response) was 0 days ago"
+            }
+          ],
+          "warnings": []
+        },
+        "s1": {
+          "status": "ok",
+          "formula_version": "s1.v1",
+          "overall": 70,
+          "pattern": "clean",
+          "sub_scores": [
+            {
+              "name": "star-burst timing",
+              "score": 45,
+              "evidence": "of 500 sampled stars, the single busiest 48h window (2015-11-18~2015-11-18) contains 197 (39%)"
+            },
+            {
+              "name": "account quality",
+              "score": 60,
+              "evidence": "90/500 sampled starrers (18%) match ≥2 suspicious-account flags (zero-repo 97/500, zero-follower 192/500, account created within 7 days of starring 55/500)"
+            },
+            {
+              "name": "burst/account correlation",
+              "score": 100,
+              "evidence": "suspicious-account rate inside the burst window: 2%, baseline outside it: 29% (gap -27%; a bigger gap means the burst and the suspicious accounts co-occur, more like coordination than organic virality)"
+            }
+          ],
+          "warnings": [],
+          "sampling_note": "stratified sample: most recent 300 + earliest 200 of 187482 total (~0.3% coverage; a campaign buried in the middle of the star history would be missed by this sample)"
+        },
+        "s3": {
+          "status": "ok",
+          "formula_version": "s3.v1",
+          "overall": 100,
+          "pattern": "clean",
+          "sub_scores": [
+            {
+              "name": "dependency existence",
+              "score": 100,
+              "evidence": "all 170 dependencies exist in their registry"
+            },
+            {
+              "name": "typosquat risk",
+              "score": 100,
+              "evidence": "170 existing dependencies checked, no typosquat-like names found"
+            },
+            {
+              "name": "package maturity",
+              "score": 100,
+              "evidence": "0/170 dependencies with known age are <30 days old (informational signal only -- a young package isn't inherently a problem)"
+            }
+          ],
+          "warnings": [],
+          "manifests_found": [
+            "package.json"
+          ]
+        },
+        "s4": {
+          "status": "ok",
+          "formula_version": "s4.v0",
+          "hints": [
+            {
+              "name": "readme badge density",
+              "observation": "3 shields.io/badge-style images found in the README",
+              "raw_value": 3,
+              "disclaimer": "Badge walls are common in professionally maintained projects too (CI/coverage/license badges) -- count alone is not evidence of anything."
+            },
+            {
+              "name": "README emoji-header density",
+              "observation": "0/10 section headers contain an emoji (0%)",
+              "raw_value": 0.0,
+              "disclaimer": "Many human-written READMEs use emoji headers by stylistic choice -- this is common decoration, not a sign of anything."
+            },
+            {
+              "name": "README boilerplate phrase hits",
+              "observation": "0/9 common templated phrases found",
+              "raw_value": 0,
+              "disclaimer": "These phrases are generic boilerplate seen across many legitimately human-written READMEs (including from templates like cookiecutter) -- presence alone proves nothing."
+            },
+            {
+              "name": "commit message length uniformity",
+              "observation": "coefficient of variation of 30 recent commit message lengths: 0.40 (lower = more uniform)",
+              "raw_value": 0.404,
+              "disclaimer": "Low variation can also come from a disciplined team following a strict commit convention (e.g. Conventional Commits) -- this alone doesn't indicate AI-generated commits."
+            },
+            {
+              "name": "repo scaffolding completeness",
+              "observation": "4 common professional-project scaffolding markers present: CONTRIBUTING.md, SECURITY.md, issue templates, .github/workflows",
+              "raw_value": 4,
+              "disclaimer": "A fully scaffolded repo (LICENSE/CONTRIBUTING/CI/issue templates) is completely normal for serious projects -- it is not itself a sign of anything; it's only worth cross-referencing against how young/inactive the repo otherwise looks (see S2)."
+            }
+          ],
+          "warnings": []
+        }
+      },
+      "_seed_meta": {
+        "language": "TypeScript",
+        "tier": "mega"
+      }
+    },
+    {
+      "status": "ok",
+      "target": "gh:facebook/react",
+      "signals": {
+        "s2": {
+          "status": "ok",
+          "formula_version": "s2.v2",
+          "overall": 96,
+          "pattern": "healthy",
+          "sub_scores": [
+            {
+              "name": "commit/release cadence",
+              "score": 100,
+              "evidence": "last commit 2026-07-10 (3 days ago); last release 2026-06-01 (41 days ago)"
+            },
+            {
+              "name": "issue responsiveness",
+              "score": 100,
+              "evidence": "2/2 recent issues got a response, median first-response time 1.0 days"
+            },
+            {
+              "name": "PR responsiveness",
+              "score": 62,
+              "evidence": "8/13 recent PRs got a response, median first-response time 0.0 days (may include unreviewed/low-quality driveby PRs; non-response here doesn't necessarily mean the maintainer is gone)"
+            },
+            {
+              "name": "bus factor",
+              "score": 100,
+              "evidence": "of 300 commits in the past year, the top 4 contributor(s) already account for ≥50% (56 total contributors, bus factor=4)"
+            },
+            {
+              "name": "maintainer 90d activity",
+              "score": 100,
+              "evidence": "most recent detectable activity (commit/release/issue response) was 0 days ago"
+            }
+          ],
+          "warnings": []
+        },
+        "s1": {
+          "status": "ok",
+          "formula_version": "s1.v1",
+          "overall": 80,
+          "pattern": "organic-burst",
+          "sub_scores": [
+            {
+              "name": "star-burst timing",
+              "score": 45,
+              "evidence": "of 500 sampled stars, the single busiest 48h window (2013-05-29~2013-05-30) contains 200 (40%)"
+            },
+            {
+              "name": "account quality",
+              "score": 85,
+              "evidence": "64/500 sampled starrers (13%) match ≥2 suspicious-account flags (zero-repo 84/500, zero-follower 154/500, account created within 7 days of starring 40/500)"
+            },
+            {
+              "name": "burst/account correlation",
+              "score": 100,
+              "evidence": "suspicious-account rate inside the burst window: 0%, baseline outside it: 21% (gap -21%; a bigger gap means the burst and the suspicious accounts co-occur, more like coordination than organic virality)"
+            }
+          ],
+          "warnings": [],
+          "sampling_note": "stratified sample: most recent 300 + earliest 200 of 246458 total (~0.2% coverage; a campaign buried in the middle of the star history would be missed by this sample)"
+        },
+        "s3": {
+          "status": "ok",
+          "formula_version": "s3.v1",
+          "overall": 100,
+          "pattern": "clean",
+          "sub_scores": [
+            {
+              "name": "dependency existence",
+              "score": 100,
+              "evidence": "all 114 dependencies exist in their registry"
+            },
+            {
+              "name": "typosquat risk",
+              "score": 100,
+              "evidence": "114 existing dependencies checked, no typosquat-like names found"
+            },
+            {
+              "name": "package maturity",
+              "score": 100,
+              "evidence": "0/114 dependencies with known age are <30 days old (informational signal only -- a young package isn't inherently a problem)"
+            }
+          ],
+          "warnings": [],
+          "manifests_found": [
+            "package.json"
+          ]
+        },
+        "s4": {
+          "status": "ok",
+          "formula_version": "s4.v0",
+          "hints": [
+            {
+              "name": "readme badge density",
+              "observation": "5 shields.io/badge-style images found in the README",
+              "raw_value": 5,
+              "disclaimer": "Badge walls are common in professionally maintained projects too (CI/coverage/license badges) -- count alone is not evidence of anything."
+            },
+            {
+              "name": "README emoji-header density",
+              "observation": "0/9 section headers contain an emoji (0%)",
+              "raw_value": 0.0,
+              "disclaimer": "Many human-written READMEs use emoji headers by stylistic choice -- this is common decoration, not a sign of anything."
+            },
+            {
+              "name": "README boilerplate phrase hits",
+              "observation": "0/9 common templated phrases found",
+              "raw_value": 0,
+              "disclaimer": "These phrases are generic boilerplate seen across many legitimately human-written READMEs (including from templates like cookiecutter) -- presence alone proves nothing."
+            },
+            {
+              "name": "commit message length uniformity",
+              "observation": "coefficient of variation of 30 recent commit message lengths: 0.18 (lower = more uniform)",
+              "raw_value": 0.183,
+              "disclaimer": "Low variation can also come from a disciplined team following a strict commit convention (e.g. Conventional Commits) -- this alone doesn't indicate AI-generated commits."
+            },
+            {
+              "name": "repo scaffolding completeness",
+              "observation": "6 common professional-project scaffolding markers present: LICENSE, CONTRIBUTING.md, CODE_OF_CONDUCT.md, SECURITY.md, issue templates, .github/workflows",
+              "raw_value": 6,
+              "disclaimer": "A fully scaffolded repo (LICENSE/CONTRIBUTING/CI/issue templates) is completely normal for serious projects -- it is not itself a sign of anything; it's only worth cross-referencing against how young/inactive the repo otherwise looks (see S2)."
+            }
+          ],
+          "warnings": []
+        }
+      },
+      "_seed_meta": {
+        "language": "JavaScript",
+        "tier": "mega"
+      }
+    },
+    {
+      "status": "ok",
+      "target": "gh:vuejs/vue",
+      "signals": {
+        "s2": {
+          "status": "ok",
+          "formula_version": "s2.v2",
+          "overall": 66,
+          "pattern": "stable-low-frequency",
+          "sub_scores": [
+            {
+              "name": "commit/release cadence",
+              "score": 35,
+              "evidence": "last commit 2024-10-10 (640 days ago); last release 2023-12-24 (931 days ago)"
+            },
+            {
+              "name": "issue responsiveness",
+              "score": 83,
+              "evidence": "5/6 recent issues got a response, median first-response time 0.0 days"
+            },
+            {
+              "name": "PR responsiveness",
+              "score": 11,
+              "evidence": "1/9 recent PRs got a response, median first-response time 0.0 days (may include unreviewed/low-quality driveby PRs; non-response here doesn't necessarily mean the maintainer is gone)"
+            },
+            {
+              "name": "bus factor",
+              "score": 50,
+              "evidence": "no commits in the past year, can't assess bus factor"
+            },
+            {
+              "name": "maintainer 90d activity",
+              "score": 100,
+              "evidence": "most recent detectable activity (commit/release/issue response) was 34 days ago"
+            }
+          ],
+          "warnings": []
+        },
+        "s1": {
+          "status": "ok",
+          "formula_version": "s1.v1",
+          "overall": 70,
+          "pattern": "clean",
+          "sub_scores": [
+            {
+              "name": "star-burst timing",
+              "score": 45,
+              "evidence": "of 500 sampled stars, the single busiest 48h window (2014-02-02~2014-02-04) contains 182 (36%)"
+            },
+            {
+              "name": "account quality",
+              "score": 60,
+              "evidence": "125/500 sampled starrers (25%) match ≥2 suspicious-account flags (zero-repo 73/500, zero-follower 246/500, account created within 7 days of starring 109/500)"
+            },
+            {
+              "name": "burst/account correlation",
+              "score": 100,
+              "evidence": "suspicious-account rate inside the burst window: 1%, baseline outside it: 39% (gap -38%; a bigger gap means the burst and the suspicious accounts co-occur, more like coordination than organic virality)"
+            }
+          ],
+          "warnings": [],
+          "sampling_note": "stratified sample: most recent 300 + earliest 200 of 210135 total (~0.2% coverage; a campaign buried in the middle of the star history would be missed by this sample)"
+        },
+        "s3": {
+          "status": "ok",
+          "formula_version": "s3.v1",
+          "overall": 100,
+          "pattern": "clean",
+          "sub_scores": [
+            {
+              "name": "dependency existence",
+              "score": 100,
+              "evidence": "all 43 dependencies exist in their registry"
+            },
+            {
+              "name": "typosquat risk",
+              "score": 100,
+              "evidence": "43 existing dependencies checked, no typosquat-like names found"
+            },
+            {
+              "name": "package maturity",
+              "score": 100,
+              "evidence": "0/43 dependencies with known age are <30 days old (informational signal only -- a young package isn't inherently a problem)"
+            }
+          ],
+          "warnings": [],
+          "manifests_found": [
+            "package.json"
+          ]
+        },
+        "s4": {
+          "status": "ok",
+          "formula_version": "s4.v0",
+          "hints": [
+            {
+              "name": "readme badge density",
+              "observation": "0 shields.io/badge-style images found in the README",
+              "raw_value": 0,
+              "disclaimer": "Badge walls are common in professionally maintained projects too (CI/coverage/license badges) -- count alone is not evidence of anything."
+            },
+            {
+              "name": "README emoji-header density",
+              "observation": "0/12 section headers contain an emoji (0%)",
+              "raw_value": 0.0,
+              "disclaimer": "Many human-written READMEs use emoji headers by stylistic choice -- this is common decoration, not a sign of anything."
+            },
+            {
+              "name": "README boilerplate phrase hits",
+              "observation": "0/9 common templated phrases found",
+              "raw_value": 0,
+              "disclaimer": "These phrases are generic boilerplate seen across many legitimately human-written READMEs (including from templates like cookiecutter) -- presence alone proves nothing."
+            },
+            {
+              "name": "commit message length uniformity",
+              "observation": "coefficient of variation of 30 recent commit message lengths: 0.44 (lower = more uniform)",
+              "raw_value": 0.435,
+              "disclaimer": "Low variation can also come from a disciplined team following a strict commit convention (e.g. Conventional Commits) -- this alone doesn't indicate AI-generated commits."
+            },
+            {
+              "name": "repo scaffolding completeness",
+              "observation": "3 common professional-project scaffolding markers present: LICENSE, issue templates, .github/workflows",
+              "raw_value": 3,
+              "disclaimer": "A fully scaffolded repo (LICENSE/CONTRIBUTING/CI/issue templates) is completely normal for serious projects -- it is not itself a sign of anything; it's only worth cross-referencing against how young/inactive the repo otherwise looks (see S2)."
+            }
+          ],
+          "warnings": []
+        }
+      },
+      "_seed_meta": {
+        "language": "JavaScript",
+        "tier": "mega"
+      }
+    },
+    {
+      "status": "ok",
+      "target": "gh:angular/angular",
+      "signals": {
+        "s2": {
+          "status": "ok",
+          "formula_version": "s2.v2",
+          "overall": 97,
+          "pattern": "healthy",
+          "sub_scores": [
+            {
+              "name": "commit/release cadence",
+              "score": 100,
+              "evidence": "last commit 2026-07-10 (2 days ago); last release 2026-07-08 (4 days ago)"
+            },
+            {
+              "name": "issue responsiveness",
+              "score": 100,
+              "evidence": "1/1 recent issues got a response, median first-response time 0.0 days"
+            },
+            {
+              "name": "PR responsiveness",
+              "score": 71,
+              "evidence": "10/14 recent PRs got a response, median first-response time 0.0 days (may include unreviewed/low-quality driveby PRs; non-response here doesn't necessarily mean the maintainer is gone)"
+            },
+            {
+              "name": "bus factor",
+              "score": 100,
+              "evidence": "of 300 commits in the past year, the top 7 contributor(s) already account for ≥50% (53 total contributors, bus factor=7)"
+            },
+            {
+              "name": "maintainer 90d activity",
+              "score": 100,
+              "evidence": "most recent detectable activity (commit/release/issue response) was 0 days ago"
+            }
+          ],
+          "warnings": []
+        },
+        "s1": {
+          "status": "ok",
+          "formula_version": "s1.v1",
+          "overall": 60,
+          "pattern": "clean",
+          "sub_scores": [
+            {
+              "name": "star-burst timing",
+              "score": 65,
+              "evidence": "of 500 sampled stars, the single busiest 48h window (2026-07-09~2026-07-11) contains 123 (25%)"
+            },
+            {
+              "name": "account quality",
+              "score": 60,
+              "evidence": "120/500 sampled starrers (24%) match ≥2 suspicious-account flags (zero-repo 71/500, zero-follower 227/500, account created within 7 days of starring 114/500)"
+            },
+            {
+              "name": "burst/account correlation",
+              "score": 55,
+              "evidence": "suspicious-account rate inside the burst window: 40%, baseline outside it: 19% (gap +21%; a bigger gap means the burst and the suspicious accounts co-occur, more like coordination than organic virality)"
+            }
+          ],
+          "warnings": [],
+          "sampling_note": "stratified sample: most recent 300 + earliest 200 of 100623 total (~0.5% coverage; a campaign buried in the middle of the star history would be missed by this sample)"
+        },
+        "s3": {
+          "status": "ok",
+          "formula_version": "s3.v1",
+          "overall": 40,
+          "pattern": "hallucinated-dependency",
+          "sub_scores": [
+            {
+              "name": "dependency existence",
+              "score": 40,
+              "evidence": "2/107 dependencies don't exist in their registry: angular-1.6, @angular/ng-dev"
+            },
+            {
+              "name": "typosquat risk",
+              "score": 100,
+              "evidence": "105 existing dependencies checked, no typosquat-like names found"
+            },
+            {
+              "name": "package maturity",
+              "score": 100,
+              "evidence": "0/105 dependencies with known age are <30 days old (informational signal only -- a young package isn't inherently a problem)"
+            }
+          ],
+          "warnings": [],
+          "manifests_found": [
+            "package.json"
+          ]
+        },
+        "s4": {
+          "status": "ok",
+          "formula_version": "s4.v0",
+          "hints": [
+            {
+              "name": "readme badge density",
+              "observation": "1 shields.io/badge-style images found in the README",
+              "raw_value": 1,
+              "disclaimer": "Badge walls are common in professionally maintained projects too (CI/coverage/license badges) -- count alone is not evidence of anything."
+            },
+            {
+              "name": "README emoji-header density",
+              "observation": "0/15 section headers contain an emoji (0%)",
+              "raw_value": 0.0,
+              "disclaimer": "Many human-written READMEs use emoji headers by stylistic choice -- this is common decoration, not a sign of anything."
+            },
+            {
+              "name": "README boilerplate phrase hits",
+              "observation": "0/9 common templated phrases found",
+              "raw_value": 0,
+              "disclaimer": "These phrases are generic boilerplate seen across many legitimately human-written READMEs (including from templates like cookiecutter) -- presence alone proves nothing."
+            },
+            {
+              "name": "commit message length uniformity",
+              "observation": "coefficient of variation of 30 recent commit message lengths: 0.26 (lower = more uniform)",
+              "raw_value": 0.258,
+              "disclaimer": "Low variation can also come from a disciplined team following a strict commit convention (e.g. Conventional Commits) -- this alone doesn't indicate AI-generated commits."
+            },
+            {
+              "name": "repo scaffolding completeness",
+              "observation": "6 common professional-project scaffolding markers present: LICENSE, CONTRIBUTING.md, CODE_OF_CONDUCT.md, SECURITY.md, issue templates, .github/workflows",
+              "raw_value": 6,
+              "disclaimer": "A fully scaffolded repo (LICENSE/CONTRIBUTING/CI/issue templates) is completely normal for serious projects -- it is not itself a sign of anything; it's only worth cross-referencing against how young/inactive the repo otherwise looks (see S2)."
+            }
+          ],
+          "warnings": []
+        }
+      },
+      "_seed_meta": {
+        "language": "TypeScript",
+        "tier": "large"
+      }
+    },
+    {
+      "status": "ok",
+      "target": "gh:sveltejs/svelte",
+      "signals": {
+        "s2": {
+          "status": "ok",
+          "formula_version": "s2.v2",
+          "overall": 67,
+          "pattern": "mixed",
+          "sub_scores": [
+            {
+              "name": "commit/release cadence",
+              "score": 100,
+              "evidence": "last commit 2026-07-12 (0 days ago); last release 2026-06-23 (19 days ago)"
+            },
+            {
+              "name": "issue responsiveness",
+              "score": 0,
+              "evidence": "0/5 recent issues got a response"
+            },
+            {
+              "name": "PR responsiveness",
+              "score": 100,
+              "evidence": "10/10 recent PRs got a response, median first-response time 0.0 days (may include unreviewed/low-quality driveby PRs; non-response here doesn't necessarily mean the maintainer is gone)"
+            },
+            {
+              "name": "bus factor",
+              "score": 80,
+              "evidence": "of 300 commits in the past year, the top 2 contributor(s) already account for ≥50% (55 total contributors, bus factor=2)"
+            },
+            {
+              "name": "maintainer 90d activity",
+              "score": 100,
+              "evidence": "most recent detectable activity (commit/release/issue response) was 0 days ago"
+            }
+          ],
+          "warnings": []
+        },
+        "s1": {
+          "status": "ok",
+          "formula_version": "s1.v1",
+          "overall": 75,
+          "pattern": "clean",
+          "sub_scores": [
+            {
+              "name": "star-burst timing",
+              "score": 65,
+              "evidence": "of 500 sampled stars, the single busiest 48h window (2016-11-27~2016-11-29) contains 167 (33%)"
+            },
+            {
+              "name": "account quality",
+              "score": 60,
+              "evidence": "90/500 sampled starrers (18%) match ≥2 suspicious-account flags (zero-repo 56/500, zero-follower 196/500, account created within 7 days of starring 71/500)"
+            },
+            {
+              "name": "burst/account correlation",
+              "score": 100,
+              "evidence": "suspicious-account rate inside the burst window: 1%, baseline outside it: 26% (gap -25%; a bigger gap means the burst and the suspicious accounts co-occur, more like coordination than organic virality)"
+            }
+          ],
+          "warnings": [],
+          "sampling_note": "stratified sample: most recent 300 + earliest 200 of 87619 total (~0.6% coverage; a campaign buried in the middle of the star history would be missed by this sample)"
+        },
+        "s3": {
+          "status": "ok",
+          "formula_version": "s3.v1",
+          "overall": 100,
+          "pattern": "clean",
+          "sub_scores": [
+            {
+              "name": "dependency existence",
+              "score": 100,
+              "evidence": "all 19 dependencies exist in their registry"
+            },
+            {
+              "name": "typosquat risk",
+              "score": 100,
+              "evidence": "19 existing dependencies checked, no typosquat-like names found"
+            },
+            {
+              "name": "package maturity",
+              "score": 100,
+              "evidence": "0/19 dependencies with known age are <30 days old (informational signal only -- a young package isn't inherently a problem)"
+            }
+          ],
+          "warnings": [],
+          "manifests_found": [
+            "package.json"
+          ]
+        },
+        "s4": {
+          "status": "ok",
+          "formula_version": "s4.v0",
+          "hints": [
+            {
+              "name": "readme badge density",
+              "observation": "2 shields.io/badge-style images found in the README",
+              "raw_value": 2,
+              "disclaimer": "Badge walls are common in professionally maintained projects too (CI/coverage/license badges) -- count alone is not evidence of anything."
+            },
+            {
+              "name": "README emoji-header density",
+              "observation": "0/6 section headers contain an emoji (0%)",
+              "raw_value": 0.0,
+              "disclaimer": "Many human-written READMEs use emoji headers by stylistic choice -- this is common decoration, not a sign of anything."
+            },
+            {
+              "name": "README boilerplate phrase hits",
+              "observation": "0/9 common templated phrases found",
+              "raw_value": 0,
+              "disclaimer": "These phrases are generic boilerplate seen across many legitimately human-written READMEs (including from templates like cookiecutter) -- presence alone proves nothing."
+            },
+            {
+              "name": "commit message length uniformity",
+              "observation": "coefficient of variation of 30 recent commit message lengths: 0.33 (lower = more uniform)",
+              "raw_value": 0.325,
+              "disclaimer": "Low variation can also come from a disciplined team following a strict commit convention (e.g. Conventional Commits) -- this alone doesn't indicate AI-generated commits."
+            },
+            {
+              "name": "repo scaffolding completeness",
+              "observation": "4 common professional-project scaffolding markers present: CONTRIBUTING.md, CODE_OF_CONDUCT.md, issue templates, .github/workflows",
+              "raw_value": 4,
+              "disclaimer": "A fully scaffolded repo (LICENSE/CONTRIBUTING/CI/issue templates) is completely normal for serious projects -- it is not itself a sign of anything; it's only worth cross-referencing against how young/inactive the repo otherwise looks (see S2)."
+            }
+          ],
+          "warnings": []
+        }
+      },
+      "_seed_meta": {
+        "language": "JavaScript",
+        "tier": "large"
+      }
+    },
+    {
+      "status": "ok",
+      "target": "gh:nodejs/node",
+      "signals": {
+        "s2": {
+          "status": "ok",
+          "formula_version": "s2.v2",
+          "overall": 88,
+          "pattern": "healthy",
+          "sub_scores": [
+            {
+              "name": "commit/release cadence",
+              "score": 100,
+              "evidence": "last commit 2026-07-13 (0 days ago); last release 2026-07-08 (4 days ago)"
+            },
+            {
+              "name": "issue responsiveness",
+              "score": 70,
+              "evidence": "no recent issues available to sample, can't assess responsiveness (neutral score)"
+            },
+            {
+              "name": "PR responsiveness",
+              "score": 70,
+              "evidence": "no recent PRs available to sample, can't assess responsiveness (neutral score)"
+            },
+            {
+              "name": "bus factor",
+              "score": 100,
+              "evidence": "of 300 commits in the past year, the top 6 contributor(s) already account for ≥50% (62 total contributors, bus factor=6)"
+            },
+            {
+              "name": "maintainer 90d activity",
+              "score": 100,
+              "evidence": "most recent detectable activity (commit/release/issue response) was 0 days ago"
+            }
+          ],
+          "warnings": []
+        },
+        "s1": {
+          "status": "ok",
+          "formula_version": "s1.v1",
+          "overall": 70,
+          "pattern": "clean",
+          "sub_scores": [
+            {
+              "name": "star-burst timing",
+              "score": 45,
+              "evidence": "of 500 sampled stars, the single busiest 48h window (2014-11-26~2014-11-28) contains 200 (40%)"
+            },
+            {
+              "name": "account quality",
+              "score": 60,
+              "evidence": "92/500 sampled starrers (18%) match ≥2 suspicious-account flags (zero-repo 62/500, zero-follower 198/500, account created within 7 days of starring 78/500)"
+            },
+            {
+              "name": "burst/account correlation",
+              "score": 100,
+              "evidence": "suspicious-account rate inside the burst window: 0%, baseline outside it: 31% (gap -31%; a bigger gap means the burst and the suspicious accounts co-occur, more like coordination than organic virality)"
+            }
+          ],
+          "warnings": [],
+          "sampling_note": "stratified sample: most recent 300 + earliest 200 of 118320 total (~0.4% coverage; a campaign buried in the middle of the star history would be missed by this sample)"
+        },
+        "s3": {
+          "status": "ok",
+          "formula_version": "s3.v1",
+          "overall": 70,
+          "pattern": "clean",
+          "sub_scores": [
+            {
+              "name": "dependency existence",
+              "score": 70,
+              "evidence": "no dependencies to check (manifest declared none)"
+            },
+            {
+              "name": "typosquat risk",
+              "score": 70,
+              "evidence": "no existing dependencies to compare (neutral score)"
+            },
+            {
+              "name": "package maturity",
+              "score": 70,
+              "evidence": "couldn't determine package age for any dependency (neutral score)"
+            }
+          ],
+          "warnings": [],
+          "manifests_found": [
+            "pyproject.toml"
+          ]
+        },
+        "s4": {
+          "status": "ok",
+          "formula_version": "s4.v0",
+          "hints": [
+            {
+              "name": "readme badge density",
+              "observation": "0 shields.io/badge-style images found in the README",
+              "raw_value": 0,
+              "disclaimer": "Badge walls are common in professionally maintained projects too (CI/coverage/license badges) -- count alone is not evidence of anything."
+            },
+            {
+              "name": "README emoji-header density",
+              "observation": "0/23 section headers contain an emoji (0%)",
+              "raw_value": 0.0,
+              "disclaimer": "Many human-written READMEs use emoji headers by stylistic choice -- this is common decoration, not a sign of anything."
+            },
+            {
+              "name": "README boilerplate phrase hits",
+              "observation": "0/9 common templated phrases found",
+              "raw_value": 0,
+              "disclaimer": "These phrases are generic boilerplate seen across many legitimately human-written READMEs (including from templates like cookiecutter) -- presence alone proves nothing."
+            },
+            {
+              "name": "commit message length uniformity",
+              "observation": "coefficient of variation of 30 recent commit message lengths: 0.18 (lower = more uniform)",
+              "raw_value": 0.181,
+              "disclaimer": "Low variation can also come from a disciplined team following a strict commit convention (e.g. Conventional Commits) -- this alone doesn't indicate AI-generated commits."
+            },
+            {
+              "name": "repo scaffolding completeness",
+              "observation": "6 common professional-project scaffolding markers present: LICENSE, CONTRIBUTING.md, CODE_OF_CONDUCT.md, SECURITY.md, issue templates, .github/workflows",
+              "raw_value": 6,
+              "disclaimer": "A fully scaffolded repo (LICENSE/CONTRIBUTING/CI/issue templates) is completely normal for serious projects -- it is not itself a sign of anything; it's only worth cross-referencing against how young/inactive the repo otherwise looks (see S2)."
+            }
+          ],
+          "warnings": []
+        }
+      },
+      "_seed_meta": {
+        "language": "JavaScript/C++",
+        "tier": "mega"
+      }
+    },
+    {
+      "status": "ok",
+      "target": "gh:denoland/deno",
+      "signals": {
+        "s2": {
+          "status": "ok",
+          "formula_version": "s2.v2",
+          "overall": 60,
+          "pattern": "mixed",
+          "sub_scores": [
+            {
+              "name": "commit/release cadence",
+              "score": 100,
+              "evidence": "last commit 2026-07-13 (0 days ago); last release 2026-07-08 (4 days ago)"
+            },
+            {
+              "name": "issue responsiveness",
+              "score": 0,
+              "evidence": "0/1 recent issues got a response"
+            },
+            {
+              "name": "PR responsiveness",
+              "score": 29,
+              "evidence": "4/14 recent PRs got a response, median first-response time 0.0 days (may include unreviewed/low-quality driveby PRs; non-response here doesn't necessarily mean the maintainer is gone)"
+            },
+            {
+              "name": "bus factor",
+              "score": 80,
+              "evidence": "of 300 commits in the past year, the top 2 contributor(s) already account for ≥50% (43 total contributors, bus factor=2)"
+            },
+            {
+              "name": "maintainer 90d activity",
+              "score": 100,
+              "evidence": "most recent detectable activity (commit/release/issue response) was 0 days ago"
+            }
+          ],
+          "warnings": []
+        },
+        "s1": {
+          "status": "ok",
+          "formula_version": "s1.v1",
+          "overall": 70,
+          "pattern": "clean",
+          "sub_scores": [
+            {
+              "name": "star-burst timing",
+              "score": 45,
+              "evidence": "of 500 sampled stars, the single busiest 48h window (2018-05-29~2018-05-29) contains 200 (40%)"
+            },
+            {
+              "name": "account quality",
+              "score": 60,
+              "evidence": "76/500 sampled starrers (15%) match ≥2 suspicious-account flags (zero-repo 54/500, zero-follower 173/500, account created within 7 days of starring 62/500)"
+            },
+            {
+              "name": "burst/account correlation",
+              "score": 100,
+              "evidence": "suspicious-account rate inside the burst window: 0%, baseline outside it: 25% (gap -25%; a bigger gap means the burst and the suspicious accounts co-occur, more like coordination than organic virality)"
+            }
+          ],
+          "warnings": [],
+          "sampling_note": "stratified sample: most recent 300 + earliest 200 of 107767 total (~0.5% coverage; a campaign buried in the middle of the star history would be missed by this sample)"
+        },
+        "s3": {
+          "status": "skipped",
+          "message": "no supported dependency manifest found (checked: pyproject.toml, requirements*.txt, package.json)"
+        },
+        "s4": {
+          "status": "ok",
+          "formula_version": "s4.v0",
+          "hints": [
+            {
+              "name": "readme badge density",
+              "observation": "1 shields.io/badge-style images found in the README",
+              "raw_value": 1,
+              "disclaimer": "Badge walls are common in professionally maintained projects too (CI/coverage/license badges) -- count alone is not evidence of anything."
+            },
+            {
+              "name": "README emoji-header density",
+              "observation": "0/6 section headers contain an emoji (0%)",
+              "raw_value": 0.0,
+              "disclaimer": "Many human-written READMEs use emoji headers by stylistic choice -- this is common decoration, not a sign of anything."
+            },
+            {
+              "name": "README boilerplate phrase hits",
+              "observation": "0/9 common templated phrases found",
+              "raw_value": 0,
+              "disclaimer": "These phrases are generic boilerplate seen across many legitimately human-written READMEs (including from templates like cookiecutter) -- presence alone proves nothing."
+            },
+            {
+              "name": "commit message length uniformity",
+              "observation": "coefficient of variation of 30 recent commit message lengths: 0.19 (lower = more uniform)",
+              "raw_value": 0.186,
+              "disclaimer": "Low variation can also come from a disciplined team following a strict commit convention (e.g. Conventional Commits) -- this alone doesn't indicate AI-generated commits."
+            },
+            {
+              "name": "repo scaffolding completeness",
+              "observation": "2 common professional-project scaffolding markers present: issue templates, .github/workflows",
+              "raw_value": 2,
+              "disclaimer": "A fully scaffolded repo (LICENSE/CONTRIBUTING/CI/issue templates) is completely normal for serious projects -- it is not itself a sign of anything; it's only worth cross-referencing against how young/inactive the repo otherwise looks (see S2)."
+            }
+          ],
+          "warnings": []
+        }
+      },
+      "_seed_meta": {
+        "language": "Rust/TypeScript",
+        "tier": "large"
+      }
+    },
+    {
+      "status": "ok",
+      "target": "gh:golang/go",
+      "signals": {
+        "s2": {
+          "status": "ok",
+          "formula_version": "s2.v2",
+          "overall": 98,
+          "pattern": "healthy",
+          "sub_scores": [
+            {
+              "name": "commit/release cadence",
+              "score": 100,
+              "evidence": "last commit 2026-07-10 (2 days ago); last release no release on record"
+            },
+            {
+              "name": "issue responsiveness",
+              "score": 92,
+              "evidence": "11/12 recent issues got a response, median first-response time 0.0 days"
+            },
+            {
+              "name": "PR responsiveness",
+              "score": 100,
+              "evidence": "3/3 recent PRs got a response, median first-response time 0.0 days (may include unreviewed/low-quality driveby PRs; non-response here doesn't necessarily mean the maintainer is gone)"
+            },
+            {
+              "name": "bus factor",
+              "score": 100,
+              "evidence": "of 300 commits in the past year, the top 7 contributor(s) already account for ≥50% (63 total contributors, bus factor=7)"
+            },
+            {
+              "name": "maintainer 90d activity",
+              "score": 100,
+              "evidence": "most recent detectable activity (commit/release/issue response) was 2 days ago"
+            }
+          ],
+          "warnings": []
+        },
+        "s1": {
+          "status": "ok",
+          "formula_version": "s1.v1",
+          "overall": 70,
+          "pattern": "clean",
+          "sub_scores": [
+            {
+              "name": "star-burst timing",
+              "score": 45,
+              "evidence": "of 500 sampled stars, the single busiest 48h window (2014-12-08~2014-12-08) contains 199 (40%)"
+            },
+            {
+              "name": "account quality",
+              "score": 60,
+              "evidence": "82/500 sampled starrers (16%) match ≥2 suspicious-account flags (zero-repo 53/500, zero-follower 202/500, account created within 7 days of starring 72/500)"
+            },
+            {
+              "name": "burst/account correlation",
+              "score": 100,
+              "evidence": "suspicious-account rate inside the burst window: 1%, baseline outside it: 27% (gap -26%; a bigger gap means the burst and the suspicious accounts co-occur, more like coordination than organic virality)"
+            }
+          ],
+          "warnings": [],
+          "sampling_note": "stratified sample: most recent 300 + earliest 200 of 135346 total (~0.4% coverage; a campaign buried in the middle of the star history would be missed by this sample)"
+        },
+        "s3": {
+          "status": "skipped",
+          "message": "no supported dependency manifest found (checked: pyproject.toml, requirements*.txt, package.json)"
+        },
+        "s4": {
+          "status": "ok",
+          "formula_version": "s4.v0",
+          "hints": [
+            {
+              "name": "readme badge density",
+              "observation": "0 shields.io/badge-style images found in the README",
+              "raw_value": 0,
+              "disclaimer": "Badge walls are common in professionally maintained projects too (CI/coverage/license badges) -- count alone is not evidence of anything."
+            },
+            {
+              "name": "README emoji-header density",
+              "observation": "0/5 section headers contain an emoji (0%)",
+              "raw_value": 0.0,
+              "disclaimer": "Many human-written READMEs use emoji headers by stylistic choice -- this is common decoration, not a sign of anything."
+            },
+            {
+              "name": "README boilerplate phrase hits",
+              "observation": "0/9 common templated phrases found",
+              "raw_value": 0,
+              "disclaimer": "These phrases are generic boilerplate seen across many legitimately human-written READMEs (including from templates like cookiecutter) -- presence alone proves nothing."
+            },
+            {
+              "name": "commit message length uniformity",
+              "observation": "coefficient of variation of 30 recent commit message lengths: 0.21 (lower = more uniform)",
+              "raw_value": 0.214,
+              "disclaimer": "Low variation can also come from a disciplined team following a strict commit convention (e.g. Conventional Commits) -- this alone doesn't indicate AI-generated commits."
+            },
+            {
+              "name": "repo scaffolding completeness",
+              "observation": "4 common professional-project scaffolding markers present: LICENSE, CONTRIBUTING.md, SECURITY.md, issue templates",
+              "raw_value": 4,
+              "disclaimer": "A fully scaffolded repo (LICENSE/CONTRIBUTING/CI/issue templates) is completely normal for serious projects -- it is not itself a sign of anything; it's only worth cross-referencing against how young/inactive the repo otherwise looks (see S2)."
+            }
+          ],
+          "warnings": []
+        }
+      },
+      "_seed_meta": {
+        "language": "Go",
+        "tier": "mega"
+      }
+    },
+    {
+      "status": "ok",
+      "target": "gh:rust-lang/rust",
+      "signals": {
+        "s2": {
+          "status": "ok",
+          "formula_version": "s2.v2",
+          "overall": 88,
+          "pattern": "healthy",
+          "sub_scores": [
+            {
+              "name": "commit/release cadence",
+              "score": 100,
+              "evidence": "last commit 2026-07-13 (0 days ago); last release 2026-07-09 (3 days ago)"
+            },
+            {
+              "name": "issue responsiveness",
+              "score": 70,
+              "evidence": "no recent issues available to sample, can't assess responsiveness (neutral score)"
+            },
+            {
+              "name": "PR responsiveness",
+              "score": 70,
+              "evidence": "no recent PRs available to sample, can't assess responsiveness (neutral score)"
+            },
+            {
+              "name": "bus factor",
+              "score": 100,
+              "evidence": "of 300 commits in the past year, the top 5 contributor(s) already account for ≥50% (66 total contributors, bus factor=5)"
+            },
+            {
+              "name": "maintainer 90d activity",
+              "score": 100,
+              "evidence": "most recent detectable activity (commit/release/issue response) was 0 days ago"
+            }
+          ],
+          "warnings": []
+        },
+        "s1": {
+          "status": "ok",
+          "formula_version": "s1.v1",
+          "overall": 80,
+          "pattern": "organic-burst",
+          "sub_scores": [
+            {
+              "name": "star-burst timing",
+              "score": 45,
+              "evidence": "of 500 sampled stars, the single busiest 48h window (2010-06-16~2010-06-16) contains 200 (40%)"
+            },
+            {
+              "name": "account quality",
+              "score": 85,
+              "evidence": "55/500 sampled starrers (11%) match ≥2 suspicious-account flags (zero-repo 53/500, zero-follower 170/500, account created within 7 days of starring 41/500)"
+            },
+            {
+              "name": "burst/account correlation",
+              "score": 100,
+              "evidence": "suspicious-account rate inside the burst window: 0%, baseline outside it: 18% (gap -18%; a bigger gap means the burst and the suspicious accounts co-occur, more like coordination than organic virality)"
+            }
+          ],
+          "warnings": [],
+          "sampling_note": "stratified sample: most recent 300 + earliest 200 of 114669 total (~0.4% coverage; a campaign buried in the middle of the star history would be missed by this sample)"
+        },
+        "s3": {
+          "status": "ok",
+          "formula_version": "s3.v1",
+          "overall": 100,
+          "pattern": "clean",
+          "sub_scores": [
+            {
+              "name": "dependency existence",
+              "score": 100,
+              "evidence": "all 4 dependencies exist in their registry"
+            },
+            {
+              "name": "typosquat risk",
+              "score": 100,
+              "evidence": "4 existing dependencies checked, no typosquat-like names found"
+            },
+            {
+              "name": "package maturity",
+              "score": 100,
+              "evidence": "0/4 dependencies with known age are <30 days old (informational signal only -- a young package isn't inherently a problem)"
+            }
+          ],
+          "warnings": [],
+          "manifests_found": [
+            "package.json"
+          ]
+        },
+        "s4": {
+          "status": "ok",
+          "formula_version": "s4.v0",
+          "hints": [
+            {
+              "name": "readme badge density",
+              "observation": "0 shields.io/badge-style images found in the README",
+              "raw_value": 0,
+              "disclaimer": "Badge walls are common in professionally maintained projects too (CI/coverage/license badges) -- count alone is not evidence of anything."
+            },
+            {
+              "name": "README emoji-header density",
+              "observation": "0/7 section headers contain an emoji (0%)",
+              "raw_value": 0.0,
+              "disclaimer": "Many human-written READMEs use emoji headers by stylistic choice -- this is common decoration, not a sign of anything."
+            },
+            {
+              "name": "README boilerplate phrase hits",
+              "observation": "0/9 common templated phrases found",
+              "raw_value": 0,
+              "disclaimer": "These phrases are generic boilerplate seen across many legitimately human-written READMEs (including from templates like cookiecutter) -- presence alone proves nothing."
+            },
+            {
+              "name": "commit message length uniformity",
+              "observation": "coefficient of variation of 30 recent commit message lengths: 0.28 (lower = more uniform)",
+              "raw_value": 0.284,
+              "disclaimer": "Low variation can also come from a disciplined team following a strict commit convention (e.g. Conventional Commits) -- this alone doesn't indicate AI-generated commits."
+            },
+            {
+              "name": "repo scaffolding completeness",
+              "observation": "4 common professional-project scaffolding markers present: CONTRIBUTING.md, CODE_OF_CONDUCT.md, issue templates, .github/workflows",
+              "raw_value": 4,
+              "disclaimer": "A fully scaffolded repo (LICENSE/CONTRIBUTING/CI/issue templates) is completely normal for serious projects -- it is not itself a sign of anything; it's only worth cross-referencing against how young/inactive the repo otherwise looks (see S2)."
+            }
+          ],
+          "warnings": []
+        }
+      },
+      "_seed_meta": {
+        "language": "Rust",
+        "tier": "mega"
+      }
+    },
+    {
+      "status": "ok",
+      "target": "gh:django/django",
+      "signals": {
+        "s2": {
+          "status": "ok",
+          "formula_version": "s2.v2",
+          "overall": 88,
+          "pattern": "healthy",
+          "sub_scores": [
+            {
+              "name": "commit/release cadence",
+              "score": 100,
+              "evidence": "last commit 2026-07-10 (2 days ago); last release no release on record"
+            },
+            {
+              "name": "issue responsiveness",
+              "score": 70,
+              "evidence": "no recent issues available to sample, can't assess responsiveness (neutral score)"
+            },
+            {
+              "name": "PR responsiveness",
+              "score": 67,
+              "evidence": "10/15 recent PRs got a response, median first-response time 0.0 days (may include unreviewed/low-quality driveby PRs; non-response here doesn't necessarily mean the maintainer is gone)"
+            },
+            {
+              "name": "bus factor",
+              "score": 100,
+              "evidence": "of 300 commits in the past year, the top 4 contributor(s) already account for ≥50% (77 total contributors, bus factor=4)"
+            },
+            {
+              "name": "maintainer 90d activity",
+              "score": 100,
+              "evidence": "most recent detectable activity (commit/release/issue response) was 2 days ago"
+            }
+          ],
+          "warnings": []
+        },
+        "s1": {
+          "status": "ok",
+          "formula_version": "s1.v1",
+          "overall": 70,
+          "pattern": "clean",
+          "sub_scores": [
+            {
+              "name": "star-burst timing",
+              "score": 45,
+              "evidence": "of 500 sampled stars, the single busiest 48h window (2012-04-28~2012-04-28) contains 200 (40%)"
+            },
+            {
+              "name": "account quality",
+              "score": 60,
+              "evidence": "99/500 sampled starrers (20%) match ≥2 suspicious-account flags (zero-repo 49/500, zero-follower 221/500, account created within 7 days of starring 91/500)"
+            },
+            {
+              "name": "burst/account correlation",
+              "score": 100,
+              "evidence": "suspicious-account rate inside the burst window: 0%, baseline outside it: 33% (gap -32%; a bigger gap means the burst and the suspicious accounts co-occur, more like coordination than organic virality)"
+            }
+          ],
+          "warnings": [],
+          "sampling_note": "stratified sample: most recent 300 + earliest 200 of 88177 total (~0.6% coverage; a campaign buried in the middle of the star history would be missed by this sample)"
+        },
+        "s3": {
+          "status": "ok",
+          "formula_version": "s3.v1",
+          "overall": 100,
+          "pattern": "clean",
+          "sub_scores": [
+            {
+              "name": "dependency existence",
+              "score": 100,
+              "evidence": "all 10 dependencies exist in their registry"
+            },
+            {
+              "name": "typosquat risk",
+              "score": 100,
+              "evidence": "10 existing dependencies checked, no typosquat-like names found"
+            },
+            {
+              "name": "package maturity",
+              "score": 100,
+              "evidence": "0/10 dependencies with known age are <30 days old (informational signal only -- a young package isn't inherently a problem)"
+            }
+          ],
+          "warnings": [
+            "PyPI packages carry no download-count signal (pypistats API too rate-limited)"
+          ],
+          "manifests_found": [
+            "pyproject.toml",
+            "package.json"
+          ]
+        },
+        "s4": {
+          "status": "ok",
+          "formula_version": "s4.v0",
+          "hints": [
+            {
+              "name": "readme badge density",
+              "observation": "0 shields.io/badge-style images found in the README",
+              "raw_value": 0,
+              "disclaimer": "Badge walls are common in professionally maintained projects too (CI/coverage/license badges) -- count alone is not evidence of anything."
+            },
+            {
+              "name": "README emoji-header density",
+              "observation": "0/0 section headers contain an emoji (0%)",
+              "raw_value": 0.0,
+              "disclaimer": "Many human-written READMEs use emoji headers by stylistic choice -- this is common decoration, not a sign of anything."
+            },
+            {
+              "name": "README boilerplate phrase hits",
+              "observation": "0/9 common templated phrases found",
+              "raw_value": 0,
+              "disclaimer": "These phrases are generic boilerplate seen across many legitimately human-written READMEs (including from templates like cookiecutter) -- presence alone proves nothing."
+            },
+            {
+              "name": "commit message length uniformity",
+              "observation": "coefficient of variation of 30 recent commit message lengths: 0.25 (lower = more uniform)",
+              "raw_value": 0.249,
+              "disclaimer": "Low variation can also come from a disciplined team following a strict commit convention (e.g. Conventional Commits) -- this alone doesn't indicate AI-generated commits."
+            },
+            {
+              "name": "repo scaffolding completeness",
+              "observation": "2 common professional-project scaffolding markers present: LICENSE, .github/workflows",
+              "raw_value": 2,
+              "disclaimer": "A fully scaffolded repo (LICENSE/CONTRIBUTING/CI/issue templates) is completely normal for serious projects -- it is not itself a sign of anything; it's only worth cross-referencing against how young/inactive the repo otherwise looks (see S2)."
+            }
+          ],
+          "warnings": []
+        }
+      },
+      "_seed_meta": {
+        "language": "Python",
+        "tier": "large"
+      }
+    },
+    {
+      "status": "ok",
+      "target": "gh:pallets/flask",
+      "signals": {
+        "s2": {
+          "status": "ok",
+          "formula_version": "s2.v2",
+          "overall": 76,
+          "pattern": "healthy",
+          "sub_scores": [
+            {
+              "name": "commit/release cadence",
+              "score": 90,
+              "evidence": "last commit 2026-06-10 (32 days ago); last release 2026-02-19 (144 days ago)"
+            },
+            {
+              "name": "issue responsiveness",
+              "score": 70,
+              "evidence": "no recent issues available to sample, can't assess responsiveness (neutral score)"
+            },
+            {
+              "name": "PR responsiveness",
+              "score": 27,
+              "evidence": "4/15 recent PRs got a response, median first-response time 0.0 days (may include unreviewed/low-quality driveby PRs; non-response here doesn't necessarily mean the maintainer is gone)"
+            },
+            {
+              "name": "bus factor",
+              "score": 60,
+              "evidence": "of 99 commits in the past year, the top 1 contributor(s) already account for ≥50% (10 total contributors, bus factor=1)"
+            },
+            {
+              "name": "maintainer 90d activity",
+              "score": 100,
+              "evidence": "most recent detectable activity (commit/release/issue response) was 2 days ago"
+            }
+          ],
+          "warnings": []
+        },
+        "s1": {
+          "status": "ok",
+          "formula_version": "s1.v1",
+          "overall": 80,
+          "pattern": "organic-burst",
+          "sub_scores": [
+            {
+              "name": "star-burst timing",
+              "score": 45,
+              "evidence": "of 500 sampled stars, the single busiest 48h window (2010-04-06~2010-04-06) contains 200 (40%)"
+            },
+            {
+              "name": "account quality",
+              "score": 85,
+              "evidence": "65/500 sampled starrers (13%) match ≥2 suspicious-account flags (zero-repo 46/500, zero-follower 192/500, account created within 7 days of starring 62/500)"
+            },
+            {
+              "name": "burst/account correlation",
+              "score": 100,
+              "evidence": "suspicious-account rate inside the burst window: 0%, baseline outside it: 22% (gap -22%; a bigger gap means the burst and the suspicious accounts co-occur, more like coordination than organic virality)"
+            }
+          ],
+          "warnings": [],
+          "sampling_note": "stratified sample: most recent 300 + earliest 200 of 71917 total (~0.7% coverage; a campaign buried in the middle of the star history would be missed by this sample)"
+        },
+        "s3": {
+          "status": "ok",
+          "formula_version": "s3.v1",
+          "overall": 100,
+          "pattern": "clean",
+          "sub_scores": [
+            {
+              "name": "dependency existence",
+              "score": 100,
+              "evidence": "all 8 dependencies exist in their registry"
+            },
+            {
+              "name": "typosquat risk",
+              "score": 100,
+              "evidence": "8 existing dependencies checked, no typosquat-like names found"
+            },
+            {
+              "name": "package maturity",
+              "score": 100,
+              "evidence": "0/8 dependencies with known age are <30 days old (informational signal only -- a young package isn't inherently a problem)"
+            }
+          ],
+          "warnings": [
+            "PyPI packages carry no download-count signal (pypistats API too rate-limited)"
+          ],
+          "manifests_found": [
+            "pyproject.toml"
+          ]
+        },
+        "s4": {
+          "status": "ok",
+          "formula_version": "s4.v0",
+          "hints": [
+            {
+              "name": "readme badge density",
+              "observation": "0 shields.io/badge-style images found in the README",
+              "raw_value": 0,
+              "disclaimer": "Badge walls are common in professionally maintained projects too (CI/coverage/license badges) -- count alone is not evidence of anything."
+            },
+            {
+              "name": "README emoji-header density",
+              "observation": "0/4 section headers contain an emoji (0%)",
+              "raw_value": 0.0,
+              "disclaimer": "Many human-written READMEs use emoji headers by stylistic choice -- this is common decoration, not a sign of anything."
+            },
+            {
+              "name": "README boilerplate phrase hits",
+              "observation": "0/9 common templated phrases found",
+              "raw_value": 0,
+              "disclaimer": "These phrases are generic boilerplate seen across many legitimately human-written READMEs (including from templates like cookiecutter) -- presence alone proves nothing."
+            },
+            {
+              "name": "commit message length uniformity",
+              "observation": "coefficient of variation of 30 recent commit message lengths: 0.44 (lower = more uniform)",
+              "raw_value": 0.436,
+              "disclaimer": "Low variation can also come from a disciplined team following a strict commit convention (e.g. Conventional Commits) -- this alone doesn't indicate AI-generated commits."
+            },
+            {
+              "name": "repo scaffolding completeness",
+              "observation": "2 common professional-project scaffolding markers present: issue templates, .github/workflows",
+              "raw_value": 2,
+              "disclaimer": "A fully scaffolded repo (LICENSE/CONTRIBUTING/CI/issue templates) is completely normal for serious projects -- it is not itself a sign of anything; it's only worth cross-referencing against how young/inactive the repo otherwise looks (see S2)."
+            }
+          ],
+          "warnings": []
+        }
+      },
+      "_seed_meta": {
+        "language": "Python",
+        "tier": "mid"
+      }
+    },
+    {
+      "status": "ok",
+      "target": "gh:psf/requests",
+      "signals": {
+        "s2": {
+          "status": "ok",
+          "formula_version": "s2.v2",
+          "overall": 88,
+          "pattern": "healthy",
+          "sub_scores": [
+            {
+              "name": "commit/release cadence",
+              "score": 100,
+              "evidence": "last commit 2026-07-09 (3 days ago); last release 2026-05-14 (59 days ago)"
+            },
+            {
+              "name": "issue responsiveness",
+              "score": 100,
+              "evidence": "1/1 recent issues got a response, median first-response time 0.0 days"
+            },
+            {
+              "name": "PR responsiveness",
+              "score": 36,
+              "evidence": "5/14 recent PRs got a response, median first-response time 0.0 days (may include unreviewed/low-quality driveby PRs; non-response here doesn't necessarily mean the maintainer is gone)"
+            },
+            {
+              "name": "bus factor",
+              "score": 60,
+              "evidence": "of 121 commits in the past year, the top 1 contributor(s) already account for ≥50% (27 total contributors, bus factor=1)"
+            },
+            {
+              "name": "maintainer 90d activity",
+              "score": 100,
+              "evidence": "most recent detectable activity (commit/release/issue response) was 3 days ago"
+            }
+          ],
+          "warnings": []
+        },
+        "s1": {
+          "status": "ok",
+          "formula_version": "s1.v1",
+          "overall": 80,
+          "pattern": "organic-burst",
+          "sub_scores": [
+            {
+              "name": "star-burst timing",
+              "score": 45,
+              "evidence": "of 500 sampled stars, the single busiest 48h window (2011-02-13~2011-02-13) contains 200 (40%)"
+            },
+            {
+              "name": "account quality",
+              "score": 85,
+              "evidence": "52/500 sampled starrers (10%) match ≥2 suspicious-account flags (zero-repo 62/500, zero-follower 100/500, account created within 7 days of starring 34/500)"
+            },
+            {
+              "name": "burst/account correlation",
+              "score": 100,
+              "evidence": "suspicious-account rate inside the burst window: 0%, baseline outside it: 17% (gap -17%; a bigger gap means the burst and the suspicious accounts co-occur, more like coordination than organic virality)"
+            }
+          ],
+          "warnings": [],
+          "sampling_note": "stratified sample: most recent 300 + earliest 200 of 54136 total (~0.9% coverage; a campaign buried in the middle of the star history would be missed by this sample)"
+        },
+        "s3": {
+          "status": "ok",
+          "formula_version": "s3.v1",
+          "overall": 100,
+          "pattern": "clean",
+          "sub_scores": [
+            {
+              "name": "dependency existence",
+              "score": 100,
+              "evidence": "all 12 dependencies exist in their registry"
+            },
+            {
+              "name": "typosquat risk",
+              "score": 100,
+              "evidence": "12 existing dependencies checked, no typosquat-like names found"
+            },
+            {
+              "name": "package maturity",
+              "score": 100,
+              "evidence": "0/12 dependencies with known age are <30 days old (informational signal only -- a young package isn't inherently a problem)"
+            }
+          ],
+          "warnings": [
+            "PyPI packages carry no download-count signal (pypistats API too rate-limited)"
+          ],
+          "manifests_found": [
+            "pyproject.toml",
+            "requirements-dev.txt"
+          ]
+        },
+        "s4": {
+          "status": "ok",
+          "formula_version": "s4.v0",
+          "hints": [
+            {
+              "name": "readme badge density",
+              "observation": "5 shields.io/badge-style images found in the README",
+              "raw_value": 5,
+              "disclaimer": "Badge walls are common in professionally maintained projects too (CI/coverage/license badges) -- count alone is not evidence of anything."
+            },
+            {
+              "name": "README emoji-header density",
+              "observation": "0/4 section headers contain an emoji (0%)",
+              "raw_value": 0.0,
+              "disclaimer": "Many human-written READMEs use emoji headers by stylistic choice -- this is common decoration, not a sign of anything."
+            },
+            {
+              "name": "README boilerplate phrase hits",
+              "observation": "0/9 common templated phrases found",
+              "raw_value": 0,
+              "disclaimer": "These phrases are generic boilerplate seen across many legitimately human-written READMEs (including from templates like cookiecutter) -- presence alone proves nothing."
+            },
+            {
+              "name": "commit message length uniformity",
+              "observation": "coefficient of variation of 30 recent commit message lengths: 0.41 (lower = more uniform)",
+              "raw_value": 0.407,
+              "disclaimer": "Low variation can also come from a disciplined team following a strict commit convention (e.g. Conventional Commits) -- this alone doesn't indicate AI-generated commits."
+            },
+            {
+              "name": "repo scaffolding completeness",
+              "observation": "3 common professional-project scaffolding markers present: LICENSE, issue templates, .github/workflows",
+              "raw_value": 3,
+              "disclaimer": "A fully scaffolded repo (LICENSE/CONTRIBUTING/CI/issue templates) is completely normal for serious projects -- it is not itself a sign of anything; it's only worth cross-referencing against how young/inactive the repo otherwise looks (see S2)."
+            }
+          ],
+          "warnings": []
+        }
+      },
+      "_seed_meta": {
+        "language": "Python",
+        "tier": "mid"
+      }
+    },
+    {
+      "status": "ok",
+      "target": "gh:tensorflow/tensorflow",
+      "signals": {
+        "s2": {
+          "status": "ok",
+          "formula_version": "s2.v2",
+          "overall": 88,
+          "pattern": "healthy",
+          "sub_scores": [
+            {
+              "name": "commit/release cadence",
+              "score": 100,
+              "evidence": "last commit 2026-07-13 (0 days ago); last release 2026-03-06 (128 days ago)"
+            },
+            {
+              "name": "issue responsiveness",
+              "score": 70,
+              "evidence": "no recent issues available to sample, can't assess responsiveness (neutral score)"
+            },
+            {
+              "name": "PR responsiveness",
+              "score": 70,
+              "evidence": "no recent PRs available to sample, can't assess responsiveness (neutral score)"
+            },
+            {
+              "name": "bus factor",
+              "score": 100,
+              "evidence": "of 300 commits in the past year, the top 4 contributor(s) already account for ≥50% (76 total contributors, bus factor=4)"
+            },
+            {
+              "name": "maintainer 90d activity",
+              "score": 100,
+              "evidence": "most recent detectable activity (commit/release/issue response) was 0 days ago"
+            }
+          ],
+          "warnings": []
+        },
+        "s1": {
+          "status": "ok",
+          "formula_version": "s1.v1",
+          "overall": 70,
+          "pattern": "clean",
+          "sub_scores": [
+            {
+              "name": "star-burst timing",
+              "score": 45,
+              "evidence": "of 500 sampled stars, the single busiest 48h window (2015-11-09~2015-11-09) contains 200 (40%)"
+            },
+            {
+              "name": "account quality",
+              "score": 60,
+              "evidence": "109/500 sampled starrers (22%) match ≥2 suspicious-account flags (zero-repo 81/500, zero-follower 221/500, account created within 7 days of starring 80/500)"
+            },
+            {
+              "name": "burst/account correlation",
+              "score": 100,
+              "evidence": "suspicious-account rate inside the burst window: 2%, baseline outside it: 35% (gap -34%; a bigger gap means the burst and the suspicious accounts co-occur, more like coordination than organic virality)"
+            }
+          ],
+          "warnings": [],
+          "sampling_note": "stratified sample: most recent 300 + earliest 200 of 196292 total (~0.3% coverage; a campaign buried in the middle of the star history would be missed by this sample)"
+        },
+        "s3": {
+          "status": "skipped",
+          "message": "no supported dependency manifest found (checked: pyproject.toml, requirements*.txt, package.json)"
+        },
+        "s4": {
+          "status": "ok",
+          "formula_version": "s4.v0",
+          "hints": [
+            {
+              "name": "readme badge density",
+              "observation": "19 shields.io/badge-style images found in the README",
+              "raw_value": 19,
+              "disclaimer": "Badge walls are common in professionally maintained projects too (CI/coverage/license badges) -- count alone is not evidence of anything."
+            },
+            {
+              "name": "README emoji-header density",
+              "observation": "0/9 section headers contain an emoji (0%)",
+              "raw_value": 0.0,
+              "disclaimer": "Many human-written READMEs use emoji headers by stylistic choice -- this is common decoration, not a sign of anything."
+            },
+            {
+              "name": "README boilerplate phrase hits",
+              "observation": "0/9 common templated phrases found",
+              "raw_value": 0,
+              "disclaimer": "These phrases are generic boilerplate seen across many legitimately human-written READMEs (including from templates like cookiecutter) -- presence alone proves nothing."
+            },
+            {
+              "name": "commit message length uniformity",
+              "observation": "coefficient of variation of 30 recent commit message lengths: 0.51 (lower = more uniform)",
+              "raw_value": 0.511,
+              "disclaimer": "Low variation can also come from a disciplined team following a strict commit convention (e.g. Conventional Commits) -- this alone doesn't indicate AI-generated commits."
+            },
+            {
+              "name": "repo scaffolding completeness",
+              "observation": "6 common professional-project scaffolding markers present: LICENSE, CONTRIBUTING.md, CODE_OF_CONDUCT.md, SECURITY.md, issue templates, .github/workflows",
+              "raw_value": 6,
+              "disclaimer": "A fully scaffolded repo (LICENSE/CONTRIBUTING/CI/issue templates) is completely normal for serious projects -- it is not itself a sign of anything; it's only worth cross-referencing against how young/inactive the repo otherwise looks (see S2)."
+            }
+          ],
+          "warnings": []
+        }
+      },
+      "_seed_meta": {
+        "language": "C++/Python",
+        "tier": "mega"
+      }
+    },
+    {
+      "status": "ok",
+      "target": "gh:pytorch/pytorch",
+      "signals": {
+        "s2": {
+          "status": "ok",
+          "formula_version": "s2.v2",
+          "overall": 88,
+          "pattern": "healthy",
+          "sub_scores": [
+            {
+              "name": "commit/release cadence",
+              "score": 100,
+              "evidence": "last commit 2026-07-13 (0 days ago); last release 2026-07-08 (4 days ago)"
+            },
+            {
+              "name": "issue responsiveness",
+              "score": 70,
+              "evidence": "no recent issues available to sample, can't assess responsiveness (neutral score)"
+            },
+            {
+              "name": "PR responsiveness",
+              "score": 70,
+              "evidence": "no recent PRs available to sample, can't assess responsiveness (neutral score)"
+            },
+            {
+              "name": "bus factor",
+              "score": 100,
+              "evidence": "of 300 commits in the past year, the top 11 contributor(s) already account for ≥50% (110 total contributors, bus factor=11)"
+            },
+            {
+              "name": "maintainer 90d activity",
+              "score": 100,
+              "evidence": "most recent detectable activity (commit/release/issue response) was 0 days ago"
+            }
+          ],
+          "warnings": []
+        },
+        "s1": {
+          "status": "ok",
+          "formula_version": "s1.v1",
+          "overall": 70,
+          "pattern": "clean",
+          "sub_scores": [
+            {
+              "name": "star-burst timing",
+              "score": 45,
+              "evidence": "of 500 sampled stars, the single busiest 48h window (2017-01-17~2017-01-18) contains 177 (35%)"
+            },
+            {
+              "name": "account quality",
+              "score": 60,
+              "evidence": "98/500 sampled starrers (20%) match ≥2 suspicious-account flags (zero-repo 85/500, zero-follower 173/500, account created within 7 days of starring 74/500)"
+            },
+            {
+              "name": "burst/account correlation",
+              "score": 100,
+              "evidence": "suspicious-account rate inside the burst window: 1%, baseline outside it: 30% (gap -29%; a bigger gap means the burst and the suspicious accounts co-occur, more like coordination than organic virality)"
+            }
+          ],
+          "warnings": [],
+          "sampling_note": "stratified sample: most recent 300 + earliest 200 of 101783 total (~0.5% coverage; a campaign buried in the middle of the star history would be missed by this sample)"
+        },
+        "s3": {
+          "status": "ok",
+          "formula_version": "s3.v1",
+          "overall": 100,
+          "pattern": "clean",
+          "sub_scores": [
+            {
+              "name": "dependency existence",
+              "score": 100,
+              "evidence": "all 15 dependencies exist in their registry"
+            },
+            {
+              "name": "typosquat risk",
+              "score": 100,
+              "evidence": "15 existing dependencies checked, no typosquat-like names found"
+            },
+            {
+              "name": "package maturity",
+              "score": 100,
+              "evidence": "0/15 dependencies with known age are <30 days old (informational signal only -- a young package isn't inherently a problem)"
+            }
+          ],
+          "warnings": [
+            "PyPI packages carry no download-count signal (pypistats API too rate-limited)"
+          ],
+          "manifests_found": [
+            "pyproject.toml",
+            "requirements.txt"
+          ]
+        },
+        "s4": {
+          "status": "ok",
+          "formula_version": "s4.v0",
+          "hints": [
+            {
+              "name": "readme badge density",
+              "observation": "0 shields.io/badge-style images found in the README",
+              "raw_value": 0,
+              "disclaimer": "Badge walls are common in professionally maintained projects too (CI/coverage/license badges) -- count alone is not evidence of anything."
+            },
+            {
+              "name": "README emoji-header density",
+              "observation": "0/32 section headers contain an emoji (0%)",
+              "raw_value": 0.0,
+              "disclaimer": "Many human-written READMEs use emoji headers by stylistic choice -- this is common decoration, not a sign of anything."
+            },
+            {
+              "name": "README boilerplate phrase hits",
+              "observation": "0/9 common templated phrases found",
+              "raw_value": 0,
+              "disclaimer": "These phrases are generic boilerplate seen across many legitimately human-written READMEs (including from templates like cookiecutter) -- presence alone proves nothing."
+            },
+            {
+              "name": "commit message length uniformity",
+              "observation": "coefficient of variation of 30 recent commit message lengths: 0.24 (lower = more uniform)",
+              "raw_value": 0.241,
+              "disclaimer": "Low variation can also come from a disciplined team following a strict commit convention (e.g. Conventional Commits) -- this alone doesn't indicate AI-generated commits."
+            },
+            {
+              "name": "repo scaffolding completeness",
+              "observation": "6 common professional-project scaffolding markers present: LICENSE, CONTRIBUTING.md, CODE_OF_CONDUCT.md, SECURITY.md, issue templates, .github/workflows",
+              "raw_value": 6,
+              "disclaimer": "A fully scaffolded repo (LICENSE/CONTRIBUTING/CI/issue templates) is completely normal for serious projects -- it is not itself a sign of anything; it's only worth cross-referencing against how young/inactive the repo otherwise looks (see S2)."
+            }
+          ],
+          "warnings": []
+        }
+      },
+      "_seed_meta": {
+        "language": "Python/C++",
+        "tier": "large"
+      }
+    },
+    {
+      "status": "ok",
+      "target": "gh:rails/rails",
+      "signals": {
+        "s2": {
+          "status": "ok",
+          "formula_version": "s2.v2",
+          "overall": 62,
+          "pattern": "mixed",
+          "sub_scores": [
+            {
+              "name": "commit/release cadence",
+              "score": 100,
+              "evidence": "last commit 2026-07-13 (0 days ago); last release 2026-03-24 (110 days ago)"
+            },
+            {
+              "name": "issue responsiveness",
+              "score": 0,
+              "evidence": "0/1 recent issues got a response"
+            },
+            {
+              "name": "PR responsiveness",
+              "score": 21,
+              "evidence": "3/14 recent PRs got a response, median first-response time 0.0 days (may include unreviewed/low-quality driveby PRs; non-response here doesn't necessarily mean the maintainer is gone)"
+            },
+            {
+              "name": "bus factor",
+              "score": 100,
+              "evidence": "of 300 commits in the past year, the top 3 contributor(s) already account for ≥50% (33 total contributors, bus factor=3)"
+            },
+            {
+              "name": "maintainer 90d activity",
+              "score": 100,
+              "evidence": "most recent detectable activity (commit/release/issue response) was 0 days ago"
+            }
+          ],
+          "warnings": []
+        },
+        "s1": {
+          "status": "ok",
+          "formula_version": "s1.v1",
+          "overall": 70,
+          "pattern": "clean",
+          "sub_scores": [
+            {
+              "name": "star-burst timing",
+              "score": 45,
+              "evidence": "of 500 sampled stars, the single busiest 48h window (2008-04-11~2008-04-11) contains 200 (40%)"
+            },
+            {
+              "name": "account quality",
+              "score": 60,
+              "evidence": "147/500 sampled starrers (29%) match ≥2 suspicious-account flags (zero-repo 100/500, zero-follower 197/500, account created within 7 days of starring 132/500)"
+            },
+            {
+              "name": "burst/account correlation",
+              "score": 100,
+              "evidence": "suspicious-account rate inside the burst window: 1%, baseline outside it: 48% (gap -47%; a bigger gap means the burst and the suspicious accounts co-occur, more like coordination than organic virality)"
+            }
+          ],
+          "warnings": [],
+          "sampling_note": "stratified sample: most recent 300 + earliest 200 of 58788 total (~0.9% coverage; a campaign buried in the middle of the star history would be missed by this sample)"
+        },
+        "s3": {
+          "status": "ok",
+          "formula_version": "s3.v1",
+          "overall": 70,
+          "pattern": "clean",
+          "sub_scores": [
+            {
+              "name": "dependency existence",
+              "score": 70,
+              "evidence": "no dependencies to check (manifest declared none)"
+            },
+            {
+              "name": "typosquat risk",
+              "score": 70,
+              "evidence": "no existing dependencies to compare (neutral score)"
+            },
+            {
+              "name": "package maturity",
+              "score": 70,
+              "evidence": "couldn't determine package age for any dependency (neutral score)"
+            }
+          ],
+          "warnings": [],
+          "manifests_found": [
+            "package.json"
+          ]
+        },
+        "s4": {
+          "status": "ok",
+          "formula_version": "s4.v0",
+          "hints": [
+            {
+              "name": "readme badge density",
+              "observation": "0 shields.io/badge-style images found in the README",
+              "raw_value": 0,
+              "disclaimer": "Badge walls are common in professionally maintained projects too (CI/coverage/license badges) -- count alone is not evidence of anything."
+            },
+            {
+              "name": "README emoji-header density",
+              "observation": "0/9 section headers contain an emoji (0%)",
+              "raw_value": 0.0,
+              "disclaimer": "Many human-written READMEs use emoji headers by stylistic choice -- this is common decoration, not a sign of anything."
+            },
+            {
+              "name": "README boilerplate phrase hits",
+              "observation": "0/9 common templated phrases found",
+              "raw_value": 0,
+              "disclaimer": "These phrases are generic boilerplate seen across many legitimately human-written READMEs (including from templates like cookiecutter) -- presence alone proves nothing."
+            },
+            {
+              "name": "commit message length uniformity",
+              "observation": "coefficient of variation of 30 recent commit message lengths: 0.22 (lower = more uniform)",
+              "raw_value": 0.218,
+              "disclaimer": "Low variation can also come from a disciplined team following a strict commit convention (e.g. Conventional Commits) -- this alone doesn't indicate AI-generated commits."
+            },
+            {
+              "name": "repo scaffolding completeness",
+              "observation": "4 common professional-project scaffolding markers present: CONTRIBUTING.md, CODE_OF_CONDUCT.md, issue templates, .github/workflows",
+              "raw_value": 4,
+              "disclaimer": "A fully scaffolded repo (LICENSE/CONTRIBUTING/CI/issue templates) is completely normal for serious projects -- it is not itself a sign of anything; it's only worth cross-referencing against how young/inactive the repo otherwise looks (see S2)."
+            }
+          ],
+          "warnings": []
+        }
+      },
+      "_seed_meta": {
+        "language": "Ruby",
+        "tier": "large"
+      }
+    },
+    {
+      "status": "ok",
+      "target": "gh:laravel/laravel",
+      "signals": {
+        "s2": {
+          "status": "ok",
+          "formula_version": "s2.v2",
+          "overall": 81,
+          "pattern": "healthy",
+          "sub_scores": [
+            {
+              "name": "commit/release cadence",
+              "score": 100,
+              "evidence": "last commit 2026-06-29 (13 days ago); last release 2026-05-27 (47 days ago)"
+            },
+            {
+              "name": "issue responsiveness",
+              "score": 70,
+              "evidence": "no recent issues available to sample, can't assess responsiveness (neutral score)"
+            },
+            {
+              "name": "PR responsiveness",
+              "score": 27,
+              "evidence": "4/15 recent PRs got a response, median first-response time 0.0 days (may include unreviewed/low-quality driveby PRs; non-response here doesn't necessarily mean the maintainer is gone)"
+            },
+            {
+              "name": "bus factor",
+              "score": 80,
+              "evidence": "of 135 commits in the past year, the top 2 contributor(s) already account for ≥50% (46 total contributors, bus factor=2)"
+            },
+            {
+              "name": "maintainer 90d activity",
+              "score": 100,
+              "evidence": "most recent detectable activity (commit/release/issue response) was 13 days ago"
+            }
+          ],
+          "warnings": []
+        },
+        "s1": {
+          "status": "ok",
+          "formula_version": "s1.v1",
+          "overall": 70,
+          "pattern": "clean",
+          "sub_scores": [
+            {
+              "name": "star-burst timing",
+              "score": 45,
+              "evidence": "of 500 sampled stars, the single busiest 48h window (2011-06-08~2011-06-08) contains 200 (40%)"
+            },
+            {
+              "name": "account quality",
+              "score": 60,
+              "evidence": "122/500 sampled starrers (24%) match ≥2 suspicious-account flags (zero-repo 112/500, zero-follower 197/500, account created within 7 days of starring 96/500)"
+            },
+            {
+              "name": "burst/account correlation",
+              "score": 100,
+              "evidence": "suspicious-account rate inside the burst window: 1%, baseline outside it: 40% (gap -39%; a bigger gap means the burst and the suspicious accounts co-occur, more like coordination than organic virality)"
+            }
+          ],
+          "warnings": [],
+          "sampling_note": "stratified sample: most recent 300 + earliest 200 of 84726 total (~0.6% coverage; a campaign buried in the middle of the star history would be missed by this sample)"
+        },
+        "s3": {
+          "status": "ok",
+          "formula_version": "s3.v1",
+          "overall": 100,
+          "pattern": "clean",
+          "sub_scores": [
+            {
+              "name": "dependency existence",
+              "score": 100,
+              "evidence": "all 5 dependencies exist in their registry"
+            },
+            {
+              "name": "typosquat risk",
+              "score": 100,
+              "evidence": "5 existing dependencies checked, no typosquat-like names found"
+            },
+            {
+              "name": "package maturity",
+              "score": 100,
+              "evidence": "0/5 dependencies with known age are <30 days old (informational signal only -- a young package isn't inherently a problem)"
+            }
+          ],
+          "warnings": [],
+          "manifests_found": [
+            "package.json"
+          ]
+        },
+        "s4": {
+          "status": "ok",
+          "formula_version": "s4.v0",
+          "hints": [
+            {
+              "name": "readme badge density",
+              "observation": "0 shields.io/badge-style images found in the README",
+              "raw_value": 0,
+              "disclaimer": "Badge walls are common in professionally maintained projects too (CI/coverage/license badges) -- count alone is not evidence of anything."
+            },
+            {
+              "name": "README emoji-header density",
+              "observation": "0/7 section headers contain an emoji (0%)",
+              "raw_value": 0.0,
+              "disclaimer": "Many human-written READMEs use emoji headers by stylistic choice -- this is common decoration, not a sign of anything."
+            },
+            {
+              "name": "README boilerplate phrase hits",
+              "observation": "0/9 common templated phrases found",
+              "raw_value": 0,
+              "disclaimer": "These phrases are generic boilerplate seen across many legitimately human-written READMEs (including from templates like cookiecutter) -- presence alone proves nothing."
+            },
+            {
+              "name": "commit message length uniformity",
+              "observation": "coefficient of variation of 30 recent commit message lengths: 0.52 (lower = more uniform)",
+              "raw_value": 0.517,
+              "disclaimer": "Low variation can also come from a disciplined team following a strict commit convention (e.g. Conventional Commits) -- this alone doesn't indicate AI-generated commits."
+            },
+            {
+              "name": "repo scaffolding completeness",
+              "observation": "1 common professional-project scaffolding markers present: .github/workflows",
+              "raw_value": 1,
+              "disclaimer": "A fully scaffolded repo (LICENSE/CONTRIBUTING/CI/issue templates) is completely normal for serious projects -- it is not itself a sign of anything; it's only worth cross-referencing against how young/inactive the repo otherwise looks (see S2)."
+            }
+          ],
+          "warnings": []
+        }
+      },
+      "_seed_meta": {
+        "language": "PHP",
+        "tier": "mid"
+      }
+    },
+    {
+      "status": "ok",
+      "target": "gh:spring-projects/spring-boot",
+      "signals": {
+        "s2": {
+          "status": "ok",
+          "formula_version": "s2.v2",
+          "overall": 77,
+          "pattern": "healthy",
+          "sub_scores": [
+            {
+              "name": "commit/release cadence",
+              "score": 100,
+              "evidence": "last commit 2026-07-07 (5 days ago); last release 2026-06-25 (17 days ago)"
+            },
+            {
+              "name": "issue responsiveness",
+              "score": 67,
+              "evidence": "8/12 recent issues got a response, median first-response time 0.0 days"
+            },
+            {
+              "name": "PR responsiveness",
+              "score": 33,
+              "evidence": "1/3 recent PRs got a response, median first-response time 0.0 days (may include unreviewed/low-quality driveby PRs; non-response here doesn't necessarily mean the maintainer is gone)"
+            },
+            {
+              "name": "bus factor",
+              "score": 60,
+              "evidence": "of 300 commits in the past year, the top 1 contributor(s) already account for ≥50% (21 total contributors, bus factor=1)"
+            },
+            {
+              "name": "maintainer 90d activity",
+              "score": 100,
+              "evidence": "most recent detectable activity (commit/release/issue response) was 2 days ago"
+            }
+          ],
+          "warnings": []
+        },
+        "s1": {
+          "status": "ok",
+          "formula_version": "s1.v1",
+          "overall": 60,
+          "pattern": "clean",
+          "sub_scores": [
+            {
+              "name": "star-burst timing",
+              "score": 65,
+              "evidence": "of 500 sampled stars, the single busiest 48h window (2026-07-09~2026-07-11) contains 113 (23%)"
+            },
+            {
+              "name": "account quality",
+              "score": 60,
+              "evidence": "118/500 sampled starrers (24%) match ≥2 suspicious-account flags (zero-repo 95/500, zero-follower 190/500, account created within 7 days of starring 100/500)"
+            },
+            {
+              "name": "burst/account correlation",
+              "score": 55,
+              "evidence": "suspicious-account rate inside the burst window: 37%, baseline outside it: 20% (gap +18%; a bigger gap means the burst and the suspicious accounts co-occur, more like coordination than organic virality)"
+            }
+          ],
+          "warnings": [],
+          "sampling_note": "stratified sample: most recent 300 + earliest 200 of 81205 total (~0.6% coverage; a campaign buried in the middle of the star history would be missed by this sample)"
+        },
+        "s3": {
+          "status": "skipped",
+          "message": "no supported dependency manifest found (checked: pyproject.toml, requirements*.txt, package.json)"
+        },
+        "s4": {
+          "status": "ok",
+          "formula_version": "s4.v0",
+          "hints": [
+            {
+              "name": "commit message length uniformity",
+              "observation": "coefficient of variation of 30 recent commit message lengths: 0.45 (lower = more uniform)",
+              "raw_value": 0.446,
+              "disclaimer": "Low variation can also come from a disciplined team following a strict commit convention (e.g. Conventional Commits) -- this alone doesn't indicate AI-generated commits."
+            },
+            {
+              "name": "repo scaffolding completeness",
+              "observation": "2 common professional-project scaffolding markers present: issue templates, .github/workflows",
+              "raw_value": 2,
+              "disclaimer": "A fully scaffolded repo (LICENSE/CONTRIBUTING/CI/issue templates) is completely normal for serious projects -- it is not itself a sign of anything; it's only worth cross-referencing against how young/inactive the repo otherwise looks (see S2)."
+            }
+          ],
+          "warnings": [
+            "no README found, README-based hints skipped"
+          ]
+        }
+      },
+      "_seed_meta": {
+        "language": "Java",
+        "tier": "large"
+      }
+    },
+    {
+      "status": "ok",
+      "target": "gh:kubernetes/kubernetes",
+      "signals": {
+        "s2": {
+          "status": "ok",
+          "formula_version": "s2.v2",
+          "overall": 88,
+          "pattern": "healthy",
+          "sub_scores": [
+            {
+              "name": "commit/release cadence",
+              "score": 100,
+              "evidence": "last commit 2026-07-13 (0 days ago); last release 2026-07-08 (4 days ago)"
+            },
+            {
+              "name": "issue responsiveness",
+              "score": 70,
+              "evidence": "no recent issues available to sample, can't assess responsiveness (neutral score)"
+            },
+            {
+              "name": "PR responsiveness",
+              "score": 70,
+              "evidence": "no recent PRs available to sample, can't assess responsiveness (neutral score)"
+            },
+            {
+              "name": "bus factor",
+              "score": 100,
+              "evidence": "of 300 commits in the past year, the top 3 contributor(s) already account for ≥50% (57 total contributors, bus factor=3)"
+            },
+            {
+              "name": "maintainer 90d activity",
+              "score": 100,
+              "evidence": "most recent detectable activity (commit/release/issue response) was 0 days ago"
+            }
+          ],
+          "warnings": []
+        },
+        "s1": {
+          "status": "ok",
+          "formula_version": "s1.v1",
+          "overall": 80,
+          "pattern": "organic-burst",
+          "sub_scores": [
+            {
+              "name": "star-burst timing",
+              "score": 45,
+              "evidence": "of 500 sampled stars, the single busiest 48h window (2014-06-10~2014-06-10) contains 200 (40%)"
+            },
+            {
+              "name": "account quality",
+              "score": 85,
+              "evidence": "74/500 sampled starrers (15%) match ≥2 suspicious-account flags (zero-repo 52/500, zero-follower 190/500, account created within 7 days of starring 61/500)"
+            },
+            {
+              "name": "burst/account correlation",
+              "score": 100,
+              "evidence": "suspicious-account rate inside the burst window: 0%, baseline outside it: 25% (gap -25%; a bigger gap means the burst and the suspicious accounts co-occur, more like coordination than organic virality)"
+            }
+          ],
+          "warnings": [],
+          "sampling_note": "stratified sample: most recent 300 + earliest 200 of 123732 total (~0.4% coverage; a campaign buried in the middle of the star history would be missed by this sample)"
+        },
+        "s3": {
+          "status": "skipped",
+          "message": "no supported dependency manifest found (checked: pyproject.toml, requirements*.txt, package.json)"
+        },
+        "s4": {
+          "status": "ok",
+          "formula_version": "s4.v0",
+          "hints": [
+            {
+              "name": "readme badge density",
+              "observation": "3 shields.io/badge-style images found in the README",
+              "raw_value": 3,
+              "disclaimer": "Badge walls are common in professionally maintained projects too (CI/coverage/license badges) -- count alone is not evidence of anything."
+            },
+            {
+              "name": "README emoji-header density",
+              "observation": "0/10 section headers contain an emoji (0%)",
+              "raw_value": 0.0,
+              "disclaimer": "Many human-written READMEs use emoji headers by stylistic choice -- this is common decoration, not a sign of anything."
+            },
+            {
+              "name": "README boilerplate phrase hits",
+              "observation": "0/9 common templated phrases found",
+              "raw_value": 0,
+              "disclaimer": "These phrases are generic boilerplate seen across many legitimately human-written READMEs (including from templates like cookiecutter) -- presence alone proves nothing."
+            },
+            {
+              "name": "commit message length uniformity",
+              "observation": "coefficient of variation of 30 recent commit message lengths: 0.22 (lower = more uniform)",
+              "raw_value": 0.217,
+              "disclaimer": "Low variation can also come from a disciplined team following a strict commit convention (e.g. Conventional Commits) -- this alone doesn't indicate AI-generated commits."
+            },
+            {
+              "name": "repo scaffolding completeness",
+              "observation": "3 common professional-project scaffolding markers present: LICENSE, CONTRIBUTING.md, issue templates",
+              "raw_value": 3,
+              "disclaimer": "A fully scaffolded repo (LICENSE/CONTRIBUTING/CI/issue templates) is completely normal for serious projects -- it is not itself a sign of anything; it's only worth cross-referencing against how young/inactive the repo otherwise looks (see S2)."
+            }
+          ],
+          "warnings": []
+        }
+      },
+      "_seed_meta": {
+        "language": "Go",
+        "tier": "mega"
+      }
+    },
+    {
+      "status": "ok",
+      "target": "gh:ansible/ansible",
+      "signals": {
+        "s2": {
+          "status": "ok",
+          "formula_version": "s2.v2",
+          "overall": 94,
+          "pattern": "healthy",
+          "sub_scores": [
+            {
+              "name": "commit/release cadence",
+              "score": 100,
+              "evidence": "last commit 2026-07-09 (3 days ago); last release 2026-07-06 (6 days ago)"
+            },
+            {
+              "name": "issue responsiveness",
+              "score": 100,
+              "evidence": "1/1 recent issues got a response, median first-response time 0.0 days"
+            },
+            {
+              "name": "PR responsiveness",
+              "score": 43,
+              "evidence": "6/14 recent PRs got a response, median first-response time 0.0 days (may include unreviewed/low-quality driveby PRs; non-response here doesn't necessarily mean the maintainer is gone)"
+            },
+            {
+              "name": "bus factor",
+              "score": 100,
+              "evidence": "of 300 commits in the past year, the top 4 contributor(s) already account for ≥50% (50 total contributors, bus factor=4)"
+            },
+            {
+              "name": "maintainer 90d activity",
+              "score": 100,
+              "evidence": "most recent detectable activity (commit/release/issue response) was 3 days ago"
+            }
+          ],
+          "warnings": []
+        },
+        "s1": {
+          "status": "ok",
+          "formula_version": "s1.v1",
+          "overall": 54,
+          "pattern": "clean",
+          "sub_scores": [
+            {
+              "name": "star-burst timing",
+              "score": 45,
+              "evidence": "of 500 sampled stars, the single busiest 48h window (2026-07-10~2026-07-12) contains 229 (46%)"
+            },
+            {
+              "name": "account quality",
+              "score": 60,
+              "evidence": "77/500 sampled starrers (15%) match ≥2 suspicious-account flags (zero-repo 63/500, zero-follower 147/500, account created within 7 days of starring 52/500)"
+            },
+            {
+              "name": "burst/account correlation",
+              "score": 55,
+              "evidence": "suspicious-account rate inside the burst window: 29%, baseline outside it: 4% (gap +26%; a bigger gap means the burst and the suspicious accounts co-occur, more like coordination than organic virality)"
+            }
+          ],
+          "warnings": [],
+          "sampling_note": "stratified sample: most recent 300 + earliest 200 of 69658 total (~0.7% coverage; a campaign buried in the middle of the star history would be missed by this sample)"
+        },
+        "s3": {
+          "status": "ok",
+          "formula_version": "s3.v1",
+          "overall": 100,
+          "pattern": "clean",
+          "sub_scores": [
+            {
+              "name": "dependency existence",
+              "score": 100,
+              "evidence": "all 5 dependencies exist in their registry"
+            },
+            {
+              "name": "typosquat risk",
+              "score": 100,
+              "evidence": "5 existing dependencies checked, no typosquat-like names found"
+            },
+            {
+              "name": "package maturity",
+              "score": 100,
+              "evidence": "0/5 dependencies with known age are <30 days old (informational signal only -- a young package isn't inherently a problem)"
+            }
+          ],
+          "warnings": [
+            "PyPI packages carry no download-count signal (pypistats API too rate-limited)"
+          ],
+          "manifests_found": [
+            "pyproject.toml",
+            "requirements.txt"
+          ]
+        },
+        "s4": {
+          "status": "ok",
+          "formula_version": "s4.v0",
+          "hints": [
+            {
+              "name": "readme badge density",
+              "observation": "7 shields.io/badge-style images found in the README",
+              "raw_value": 7,
+              "disclaimer": "Badge walls are common in professionally maintained projects too (CI/coverage/license badges) -- count alone is not evidence of anything."
+            },
+            {
+              "name": "README emoji-header density",
+              "observation": "0/10 section headers contain an emoji (0%)",
+              "raw_value": 0.0,
+              "disclaimer": "Many human-written READMEs use emoji headers by stylistic choice -- this is common decoration, not a sign of anything."
+            },
+            {
+              "name": "README boilerplate phrase hits",
+              "observation": "0/9 common templated phrases found",
+              "raw_value": 0,
+              "disclaimer": "These phrases are generic boilerplate seen across many legitimately human-written READMEs (including from templates like cookiecutter) -- presence alone proves nothing."
+            },
+            {
+              "name": "commit message length uniformity",
+              "observation": "coefficient of variation of 30 recent commit message lengths: 0.18 (lower = more uniform)",
+              "raw_value": 0.183,
+              "disclaimer": "Low variation can also come from a disciplined team following a strict commit convention (e.g. Conventional Commits) -- this alone doesn't indicate AI-generated commits."
+            },
+            {
+              "name": "repo scaffolding completeness",
+              "observation": "1 common professional-project scaffolding markers present: issue templates",
+              "raw_value": 1,
+              "disclaimer": "A fully scaffolded repo (LICENSE/CONTRIBUTING/CI/issue templates) is completely normal for serious projects -- it is not itself a sign of anything; it's only worth cross-referencing against how young/inactive the repo otherwise looks (see S2)."
+            }
+          ],
+          "warnings": []
+        }
+      },
+      "_seed_meta": {
+        "language": "Python",
+        "tier": "large"
+      }
+    },
+    {
+      "status": "ok",
+      "target": "gh:redis/redis",
+      "signals": {
+        "s2": {
+          "status": "ok",
+          "formula_version": "s2.v2",
+          "overall": 88,
+          "pattern": "healthy",
+          "sub_scores": [
+            {
+              "name": "commit/release cadence",
+              "score": 100,
+              "evidence": "last commit 2026-07-10 (2 days ago); last release 2026-06-04 (38 days ago)"
+            },
+            {
+              "name": "issue responsiveness",
+              "score": 70,
+              "evidence": "no recent issues available to sample, can't assess responsiveness (neutral score)"
+            },
+            {
+              "name": "PR responsiveness",
+              "score": 73,
+              "evidence": "11/15 recent PRs got a response, median first-response time 0.0 days (may include unreviewed/low-quality driveby PRs; non-response here doesn't necessarily mean the maintainer is gone)"
+            },
+            {
+              "name": "bus factor",
+              "score": 100,
+              "evidence": "of 300 commits in the past year, the top 8 contributor(s) already account for ≥50% (75 total contributors, bus factor=8)"
+            },
+            {
+              "name": "maintainer 90d activity",
+              "score": 100,
+              "evidence": "most recent detectable activity (commit/release/issue response) was 0 days ago"
+            }
+          ],
+          "warnings": []
+        },
+        "s1": {
+          "status": "ok",
+          "formula_version": "s1.v1",
+          "overall": 80,
+          "pattern": "organic-burst",
+          "sub_scores": [
+            {
+              "name": "star-burst timing",
+              "score": 45,
+              "evidence": "of 500 sampled stars, the single busiest 48h window (2009-03-21~2009-03-21) contains 200 (40%)"
+            },
+            {
+              "name": "account quality",
+              "score": 85,
+              "evidence": "41/500 sampled starrers (8%) match ≥2 suspicious-account flags (zero-repo 50/500, zero-follower 144/500, account created within 7 days of starring 21/500)"
+            },
+            {
+              "name": "burst/account correlation",
+              "score": 100,
+              "evidence": "suspicious-account rate inside the burst window: 0%, baseline outside it: 14% (gap -14%; a bigger gap means the burst and the suspicious accounts co-occur, more like coordination than organic virality)"
+            }
+          ],
+          "warnings": [],
+          "sampling_note": "stratified sample: most recent 300 + earliest 200 of 75438 total (~0.7% coverage; a campaign buried in the middle of the star history would be missed by this sample)"
+        },
+        "s3": {
+          "status": "skipped",
+          "message": "no supported dependency manifest found (checked: pyproject.toml, requirements*.txt, package.json)"
+        },
+        "s4": {
+          "status": "ok",
+          "formula_version": "s4.v0",
+          "hints": [
+            {
+              "name": "readme badge density",
+              "observation": "1 shields.io/badge-style images found in the README",
+              "raw_value": 1,
+              "disclaimer": "Badge walls are common in professionally maintained projects too (CI/coverage/license badges) -- count alone is not evidence of anything."
+            },
+            {
+              "name": "README emoji-header density",
+              "observation": "0/35 section headers contain an emoji (0%)",
+              "raw_value": 0.0,
+              "disclaimer": "Many human-written READMEs use emoji headers by stylistic choice -- this is common decoration, not a sign of anything."
+            },
+            {
+              "name": "README boilerplate phrase hits",
+              "observation": "0/9 common templated phrases found",
+              "raw_value": 0,
+              "disclaimer": "These phrases are generic boilerplate seen across many legitimately human-written READMEs (including from templates like cookiecutter) -- presence alone proves nothing."
+            },
+            {
+              "name": "commit message length uniformity",
+              "observation": "coefficient of variation of 30 recent commit message lengths: 0.26 (lower = more uniform)",
+              "raw_value": 0.256,
+              "disclaimer": "Low variation can also come from a disciplined team following a strict commit convention (e.g. Conventional Commits) -- this alone doesn't indicate AI-generated commits."
+            },
+            {
+              "name": "repo scaffolding completeness",
+              "observation": "5 common professional-project scaffolding markers present: CONTRIBUTING.md, CODE_OF_CONDUCT.md, SECURITY.md, issue templates, .github/workflows",
+              "raw_value": 5,
+              "disclaimer": "A fully scaffolded repo (LICENSE/CONTRIBUTING/CI/issue templates) is completely normal for serious projects -- it is not itself a sign of anything; it's only worth cross-referencing against how young/inactive the repo otherwise looks (see S2)."
+            }
+          ],
+          "warnings": []
+        }
+      },
+      "_seed_meta": {
+        "language": "C",
+        "tier": "large"
+      }
+    },
+    {
+      "status": "ok",
+      "target": "gh:elastic/elasticsearch",
+      "signals": {
+        "s2": {
+          "status": "ok",
+          "formula_version": "s2.v2",
+          "overall": 88,
+          "pattern": "healthy",
+          "sub_scores": [
+            {
+              "name": "commit/release cadence",
+              "score": 100,
+              "evidence": "last commit 2026-07-13 (0 days ago); last release 2026-06-30 (12 days ago)"
+            },
+            {
+              "name": "issue responsiveness",
+              "score": 70,
+              "evidence": "no recent issues available to sample, can't assess responsiveness (neutral score)"
+            },
+            {
+              "name": "PR responsiveness",
+              "score": 70,
+              "evidence": "no recent PRs available to sample, can't assess responsiveness (neutral score)"
+            },
+            {
+              "name": "bus factor",
+              "score": 100,
+              "evidence": "of 300 commits in the past year, the top 7 contributor(s) already account for ≥50% (87 total contributors, bus factor=7)"
+            },
+            {
+              "name": "maintainer 90d activity",
+              "score": 100,
+              "evidence": "most recent detectable activity (commit/release/issue response) was 0 days ago"
+            }
+          ],
+          "warnings": []
+        },
+        "s1": {
+          "status": "ok",
+          "formula_version": "s1.v1",
+          "overall": 70,
+          "pattern": "clean",
+          "sub_scores": [
+            {
+              "name": "star-burst timing",
+              "score": 45,
+              "evidence": "of 500 sampled stars, the single busiest 48h window (2010-02-08~2010-02-08) contains 200 (40%)"
+            },
+            {
+              "name": "account quality",
+              "score": 60,
+              "evidence": "85/500 sampled starrers (17%) match ≥2 suspicious-account flags (zero-repo 68/500, zero-follower 184/500, account created within 7 days of starring 67/500)"
+            },
+            {
+              "name": "burst/account correlation",
+              "score": 100,
+              "evidence": "suspicious-account rate inside the burst window: 0%, baseline outside it: 28% (gap -28%; a bigger gap means the burst and the suspicious accounts co-occur, more like coordination than organic virality)"
+            }
+          ],
+          "warnings": [],
+          "sampling_note": "stratified sample: most recent 300 + earliest 200 of 77610 total (~0.6% coverage; a campaign buried in the middle of the star history would be missed by this sample)"
+        },
+        "s3": {
+          "status": "skipped",
+          "message": "no supported dependency manifest found (checked: pyproject.toml, requirements*.txt, package.json)"
+        },
+        "s4": {
+          "status": "ok",
+          "formula_version": "s4.v0",
+          "hints": [
+            {
+              "name": "commit message length uniformity",
+              "observation": "coefficient of variation of 30 recent commit message lengths: 0.37 (lower = more uniform)",
+              "raw_value": 0.374,
+              "disclaimer": "Low variation can also come from a disciplined team following a strict commit convention (e.g. Conventional Commits) -- this alone doesn't indicate AI-generated commits."
+            },
+            {
+              "name": "repo scaffolding completeness",
+              "observation": "3 common professional-project scaffolding markers present: CONTRIBUTING.md, issue templates, .github/workflows",
+              "raw_value": 3,
+              "disclaimer": "A fully scaffolded repo (LICENSE/CONTRIBUTING/CI/issue templates) is completely normal for serious projects -- it is not itself a sign of anything; it's only worth cross-referencing against how young/inactive the repo otherwise looks (see S2)."
+            }
+          ],
+          "warnings": [
+            "no README found, README-based hints skipped"
+          ]
+        }
+      },
+      "_seed_meta": {
+        "language": "Java",
+        "tier": "large"
+      }
+    },
+    {
+      "status": "ok",
+      "target": "gh:flutter/flutter",
+      "signals": {
+        "s2": {
+          "status": "ok",
+          "formula_version": "s2.v2",
+          "overall": 89,
+          "pattern": "healthy",
+          "sub_scores": [
+            {
+              "name": "commit/release cadence",
+              "score": 100,
+              "evidence": "last commit 2026-07-12 (0 days ago); last release 2024-01-11 (913 days ago)"
+            },
+            {
+              "name": "issue responsiveness",
+              "score": 70,
+              "evidence": "no recent issues available to sample, can't assess responsiveness (neutral score)"
+            },
+            {
+              "name": "PR responsiveness",
+              "score": 80,
+              "evidence": "4/5 recent PRs got a response, median first-response time 0.0 days (may include unreviewed/low-quality driveby PRs; non-response here doesn't necessarily mean the maintainer is gone)"
+            },
+            {
+              "name": "bus factor",
+              "score": 100,
+              "evidence": "of 300 commits in the past year, the top 5 contributor(s) already account for ≥50% (71 total contributors, bus factor=5)"
+            },
+            {
+              "name": "maintainer 90d activity",
+              "score": 100,
+              "evidence": "most recent detectable activity (commit/release/issue response) was 0 days ago"
+            }
+          ],
+          "warnings": [
+            "issue+PR sample smaller than target (got 5, wanted 15)"
+          ]
+        },
+        "s1": {
+          "status": "ok",
+          "formula_version": "s1.v1",
+          "overall": 70,
+          "pattern": "clean",
+          "sub_scores": [
+            {
+              "name": "star-burst timing",
+              "score": 45,
+              "evidence": "of 500 sampled stars, the single busiest 48h window (2015-04-30~2015-05-02) contains 177 (35%)"
+            },
+            {
+              "name": "account quality",
+              "score": 60,
+              "evidence": "97/500 sampled starrers (19%) match ≥2 suspicious-account flags (zero-repo 81/500, zero-follower 217/500, account created within 7 days of starring 78/500)"
+            },
+            {
+              "name": "burst/account correlation",
+              "score": 100,
+              "evidence": "suspicious-account rate inside the burst window: 1%, baseline outside it: 29% (gap -28%; a bigger gap means the burst and the suspicious accounts co-occur, more like coordination than organic virality)"
+            }
+          ],
+          "warnings": [],
+          "sampling_note": "stratified sample: most recent 300 + earliest 200 of 177850 total (~0.3% coverage; a campaign buried in the middle of the star history would be missed by this sample)"
+        },
+        "s3": {
+          "status": "skipped",
+          "message": "no supported dependency manifest found (checked: pyproject.toml, requirements*.txt, package.json)"
+        },
+        "s4": {
+          "status": "ok",
+          "formula_version": "s4.v0",
+          "hints": [
+            {
+              "name": "readme badge density",
+              "observation": "5 shields.io/badge-style images found in the README",
+              "raw_value": 5,
+              "disclaimer": "Badge walls are common in professionally maintained projects too (CI/coverage/license badges) -- count alone is not evidence of anything."
+            },
+            {
+              "name": "README emoji-header density",
+              "observation": "0/7 section headers contain an emoji (0%)",
+              "raw_value": 0.0,
+              "disclaimer": "Many human-written READMEs use emoji headers by stylistic choice -- this is common decoration, not a sign of anything."
+            },
+            {
+              "name": "README boilerplate phrase hits",
+              "observation": "1/9 common templated phrases found: we welcome contributions",
+              "raw_value": 1,
+              "disclaimer": "These phrases are generic boilerplate seen across many legitimately human-written READMEs (including from templates like cookiecutter) -- presence alone proves nothing."
+            },
+            {
+              "name": "commit message length uniformity",
+              "observation": "coefficient of variation of 30 recent commit message lengths: 0.23 (lower = more uniform)",
+              "raw_value": 0.235,
+              "disclaimer": "Low variation can also come from a disciplined team following a strict commit convention (e.g. Conventional Commits) -- this alone doesn't indicate AI-generated commits."
+            },
+            {
+              "name": "repo scaffolding completeness",
+              "observation": "5 common professional-project scaffolding markers present: LICENSE, CONTRIBUTING.md, CODE_OF_CONDUCT.md, issue templates, .github/workflows",
+              "raw_value": 5,
+              "disclaimer": "A fully scaffolded repo (LICENSE/CONTRIBUTING/CI/issue templates) is completely normal for serious projects -- it is not itself a sign of anything; it's only worth cross-referencing against how young/inactive the repo otherwise looks (see S2)."
+            }
+          ],
+          "warnings": []
+        }
+      },
+      "_seed_meta": {
+        "language": "Dart",
+        "tier": "mega"
+      }
+    }
+  ]
+}

@@ -26,5 +26,5 @@ target-version = "py310"
 select = ["E", "F", "I", "UP"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
-pythonpath = ["src"]
+testpaths = ["tests", "leaderboard"]
+pythonpath = ["src", "leaderboard"]
