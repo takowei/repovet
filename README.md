@@ -33,6 +33,18 @@ signal's evidence text, not just `--reply`'s wrapper copy.
 
 Without an install, you can also run it as `PYTHONPATH=src python3 -m repovet gh:owner/repo`.
 
+## Use as a Claude Code / agent skill
+
+`skills/repovet/SKILL.md` packages this CLI as an agent skill: install it and
+your coding agent will vet any pasted GitHub URL on request ("is this repo
+trustworthy?") and report the scores with evidence.
+
+```bash
+mkdir -p ~/.claude/skills/repovet
+curl -fsSL https://raw.githubusercontent.com/takowei/repovet/main/skills/repovet/SKILL.md \
+  -o ~/.claude/skills/repovet/SKILL.md
+```
+
 Without `GITHUB_TOKEN`, S2 still runs (anonymous REST) but S1 is skipped
 entirely — `signals.s1.status == "skipped"` in `--json`, clearly marked in
 the table view too.
