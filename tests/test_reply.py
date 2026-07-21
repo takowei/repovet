@@ -66,3 +66,66 @@ def test_render_reply_no_signals_ok_does_not_crash():
     }
     text = render_reply_en(record)
     assert "Key evidence:" in text
+
+
+_RECORD_WITH_S4 = {
+    **_RECORD,
+    "signals": {
+        **_RECORD["signals"],
+        "s4": {
+            "status": "ok",
+            "formula_version": "s4.v0",
+            "hints": [
+                {
+                    "name": "readme-tone",
+                    "observation": "uniform phrasing",
+                    "disclaimer": "not a verdict",
+                }
+            ],
+            "warnings": [],
+        },
+    },
+}
+
+
+def test_render_reply_en_include_s4_adds_hints_block():
+    without = render_reply_en(_RECORD_WITH_S4, include_s4=False)
+    assert "AI-slop hints" not in without
+
+    with_s4 = render_reply_en(_RECORD_WITH_S4, include_s4=True)
+    assert "AI-slop hints (S4, v0" in with_s4
+    assert "readme-tone: uniform phrasing" in with_s4
+    assert "(not a verdict)" in with_s4
+
+
+def test_render_reply_zh_include_s4_adds_hints_block():
+    with_s4 = render_reply_zh(_RECORD_WITH_S4, include_s4=True)
+    assert "AI-slop 特徵提示" in with_s4
+    assert "readme-tone: uniform phrasing" in with_s4
+
+
+def test_render_reply_include_s4_no_effect_when_s4_missing_or_not_ok():
+    # _RECORD has no "s4" key at all -- include_s4 must not crash or add a block.
+    text = render_reply_en(_RECORD, include_s4=True)
+    assert "AI-slop hints" not in text
+
+
+def test_render_reply_skips_signal_key_entirely_absent_from_dict():
+    # Only s2 present; s1/s3 not in the dict at all (distinct from status=skipped).
+    record = {
+        "target": "gh:acme/lib",
+        "signals": {
+            "s2": {
+                "status": "ok",
+                "formula_version": "s2.v2",
+                "overall": 86,
+                "pattern": "healthy",
+                "sub_scores": [{"name": "cadence", "score": 100, "evidence": "recent commit"}],
+                "warnings": [],
+            },
+        },
+    }
+    text = render_reply_en(record)
+    assert "Zombie maintenance (S2): 86/100 (healthy)" in text
+    assert "Anomalous star pattern (S1)" not in text
+    assert "Hallucinated dependency (S3)" not in text
