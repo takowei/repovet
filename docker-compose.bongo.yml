@@ -1,0 +1,54 @@
+# Bongo-server deploy for repovet's two "needs a real server" pieces:
+#   - the GitHub App webhook receiver (app_server.py)
+#   - the daily leaderboard scan (leaderboard/scan_leaderboard.py), daemonized
+#
+# Same reasoning as pricedrop/pricewatch's bongo variants: rootless Docker,
+# no port 80/443, so only the backend is exposed directly + a cloudflared
+# quick tunnel gives the webhook a public HTTPS URL. See ~/docker/Repovet/
+# Server.md (on the server) for operational notes.
+#
+# Usage (from the directory this file lives in, on the server):
+#   docker compose -f docker-compose.bongo.yml up -d --build
+
+services:
+  app:
+    build: .
+    container_name: repovet-app
+    restart: unless-stopped
+    env_file: ./.env
+    volumes:
+      - repovet_data:/data
+    ports:
+      - "8002:8080"
+
+  # Daily leaderboard scan, daemonized (was previously a session-bound cron
+  # inside a Claude Code session -- dies when the session ends). Shares the
+  # app image; overrides CMD to run scripts/scan_loop.sh instead of serving
+  # HTTP. Writes to the same repovet_data volume as `app` so results survive
+  # container restarts and are inspectable via `docker exec`.
+  scan-cron:
+    build: .
+    container_name: repovet-scan-cron
+    restart: unless-stopped
+    env_file: ./.env
+    volumes:
+      - repovet_data:/data
+    command: ["bash", "scripts/scan_loop.sh"]
+    healthcheck:
+      disable: true
+
+  # cloudflared quick tunnel -- pure outbound, no account/domain needed.
+  # Exposes app:8080 (mapped to host 8002) at a random *.trycloudflare.com
+  # URL. See Server.md for how to read the current URL; it changes if this
+  # container restarts.
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: repovet-tunnel
+    restart: unless-stopped
+    network_mode: host
+    command: ["tunnel", "--url", "http://127.0.0.1:8002", "--no-autoupdate"]
+    depends_on:
+      - app
+
+volumes:
+  repovet_data:
