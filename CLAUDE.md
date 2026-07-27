@@ -4,6 +4,21 @@ Developer trust check for GitHub repos before you depend on them — one-shot
 CLI that scores public, re-runnable trust signals with evidence, no LLM in
 the scoring path. Spec: `../research/repovet-mvp-spec-2026-07.md`.
 
+## 狀態（2026-07-21）
+
+M5 done: GitHub App skeleton for Marketplace listing (stage 1, free-tier
+only) — `app_server.py` (stdlib `http.server` webhook server, no Flask),
+`app_auth.py` (RS256 App JWT + installation token exchange via PyJWT),
+`webhook_security.py` (HMAC signature verification, fails closed),
+`app_webhook.py` (dispatches `pull_request` → scan+comment reusing
+`bot.py`'s posting path; `marketplace_purchase` → `plan_store.py` sqlite,
+wired up now even though stage 1 ships free, since GitHub requires 100+
+installs before a paid plan and the code has to pre-exist). New deps:
+PyJWT, cryptography. 38 new tests (158 total). Manual GitHub-side steps
+(create App, deploy webhook host, submit for Marketplace review) are not
+automatable from this sandbox — see README "GitHub App / Marketplace" for
+the full checklist. Root's hands from here.
+
 ## 狀態（2026-07-09）
 
 M4 done: GitHub Action automation layer on top of the M0-M3 engine — an

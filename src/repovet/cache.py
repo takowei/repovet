@@ -18,7 +18,10 @@ class ResponseCache:
     def __init__(self, path: Path = DEFAULT_CACHE_PATH):
         self.path = path
         self.path.parent.mkdir(parents=True, exist_ok=True)
-        self._conn = sqlite3.connect(self.path)
+        # check_same_thread=False: app_server.py handles each webhook
+        # delivery on its own thread (ThreadingHTTPServer); sqlite3 still
+        # serializes access internally, which is fine at webhook volume.
+        self._conn = sqlite3.connect(self.path, check_same_thread=False)
         self._conn.execute(
             """
             CREATE TABLE IF NOT EXISTS responses (
