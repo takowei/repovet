@@ -397,6 +397,82 @@ the only platform with an accepted automated-comment convention
 above only ever act inside a repo whose own maintainer explicitly invoked
 repovet — never a third party's.
 
+## GitHub App / Marketplace (stage 1: free-tier listing)
+
+A third automation shape, on top of the two Action-based ones above: a
+**GitHub App** with its own webhook server, aimed at the GitHub
+Marketplace. Where the Action bots above run inside GitHub's own runners
+with no infrastructure to operate, a Marketplace _App_ (as opposed to a
+Marketplace _Action_) requires you to run a persistent webhook endpoint
+yourself — GitHub calls out to it on every event, there's no way around
+that for App-type listings.
+
+**Why an App and not "just" the Action bot above?** Marketplace listings
+for Actions exist too, but the paid-subscription billing plumbing
+(`marketplace_purchase` webhook, per-account plan state) is only wired up
+for Apps in GitHub's model — so the App route is what stage 2 (paid tiers)
+needs, and stage 1 builds on the same skeleton starting free-only.
+
+### What's implemented
+
+- `src/repovet/app_server.py` — a small stdlib-only (`http.server`, no
+  Flask) webhook server. `POST /webhook` verifies the
+  `X-Hub-Signature-256` HMAC (`src/repovet/webhook_security.py`, fails
+  closed on any missing/invalid signature) before touching the payload.
+  `GET /health` for uptime checks.
+- `src/repovet/app_auth.py` — signs the App's RS256 JWT and exchanges it
+  for a short-lived per-installation access token (`get_installation_token`).
+  Tokens are minted fresh per webhook delivery, never cached across requests.
+- `src/repovet/app_webhook.py` — event dispatch:
+  - `pull_request` (`opened`/`reopened`/`synchronize`): runs a repovet scan
+    on the PR's repo and posts the result as a PR comment, reusing the same
+    `bot.py`/`reply.py` rendering path as the Action bot.
+  - `marketplace_purchase` (`purchased`/`changed`/`pending_change`/
+    `cancelled`): keeps `src/repovet/plan_store.py` (local sqlite) in sync
+    with GitHub's billing state. **Wired up now even though stage 1 ships
+    free-only** — GitHub requires an App to already have ≥100 installations
+    before a paid plan can go live, so this stays dormant until that
+    threshold is hit, but the code path has to exist first.
+  - `installation`, `installation_repositories`, `ping`: acknowledged, no-op.
+- `src/repovet/plan_store.py` — sqlite table of `account_login → plan`;
+  `get_plan()` is the one place any future feature gating would read from.
+
+### Running the server
+
+```bash
+REPOVET_APP_ID=... \
+REPOVET_APP_PRIVATE_KEY="$(cat app-private-key.pem)" \
+REPOVET_WEBHOOK_SECRET=... \
+python3 -m repovet.app_server   # or: repovet-app-server
+```
+
+All three secrets come from the environment only — never a literal file
+path in source, never logged. `PORT` (default `8080`) is the only other
+env var it reads.
+
+### Manual steps (GitHub-side, not automatable from this sandbox — Root's hands)
+
+1. Create the GitHub App at github.com/settings/apps/new: name, homepage
+   URL, webhook URL (`https://<your-host>/webhook`), webhook secret,
+   permissions (`Pull requests: Read & write`, `Contents: Read`,
+   `Metadata: Read`), and subscribe to events `pull_request`,
+   `marketplace_purchase`, `installation`, `installation_repositories`.
+2. Generate a private key for the App (downloads a `.pem`); keep it and
+   the webhook secret out of the repo — set them as env vars/secrets on
+   wherever the server is deployed, never committed.
+3. Deploy `repovet-app-server` somewhere with a stable public HTTPS URL
+   (a small VPS behind a reverse proxy, or any container host) — this repo
+   does not include deployment/hosting config, only the server itself.
+4. List the App on GitHub Marketplace: Marketplace Developer Agreement,
+   logo, feature card, screenshots, listing copy, pricing plans page (free
+   plan only for stage 1).
+5. Submit for review (real person, no published SLA — community reports
+   ~2-6 weeks).
+6. Once ≥100 installations are reached, add a paid plan on the Marketplace
+   listing page — `plan_store`/`app_webhook.py` already handle the
+   resulting `marketplace_purchase` events, no code changes needed to flip
+   that on.
+
 ## Testing
 
 ```bash
