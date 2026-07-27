@@ -10,10 +10,13 @@ requires-python = ">=3.10"
 dependencies = [
     "requests>=2.31",
     "tomli>=2.0; python_version < '3.11'",
+    "PyJWT>=2.3",
+    "cryptography>=3.4",
 ]
 
 [project.scripts]
 repovet = "repovet.cli:main"
+repovet-app-server = "repovet.app_server:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/repovet"]

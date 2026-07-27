@@ -1,0 +1,28 @@
+# Template for ~/docker/Repovet/.env on bongo (rename to `.env` there; keep
+# it out of git -- this sample file has no real secrets in it).
+#
+# REPOVET_APP_ID / REPOVET_APP_PRIVATE_KEY: real values only exist once Root
+# creates the actual GitHub App (Settings -> Developer settings -> GitHub
+# Apps -> New GitHub App). Until then these are placeholders -- app_server
+# will boot fine (it only touches these when actually handling a
+# pull_request event, which won't happen without a real installation) but
+# any real event will error out because "placeholder" is not a valid App ID.
+REPOVET_APP_ID=placeholder
+REPOVET_APP_PRIVATE_KEY=placeholder
+
+# REPOVET_WEBHOOK_SECRET: generate this ON THE SERVER with
+# `openssl rand -hex 32` and paste the value here. It does not need to come
+# from GitHub -- it's a shared secret you also paste into the GitHub App's
+# "Webhook secret" field when you create the App, so GitHub signs deliveries
+# with the same value this server verifies against. The verification logic
+# (webhook_security.py) is real and fails closed regardless of this value's
+# origin.
+REPOVET_WEBHOOK_SECRET=placeholder
+
+# Optional: raises the leaderboard scan's GitHub API rate limit from 60/hr
+# (anonymous) to 5000/hr and enables the S1 (star pattern) signal. A
+# read-only PAT is enough -- see README "Install / run".
+GITHUB_TOKEN=
+
+# Daily scan interval in seconds (default 86400 = 24h). Lower for testing.
+SCAN_INTERVAL_SECONDS=86400
