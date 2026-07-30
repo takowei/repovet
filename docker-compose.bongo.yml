@@ -37,6 +37,23 @@ services:
     healthcheck:
       disable: true
 
+  # Weekly content-curation scan: scores today's GitHub Trending repos with
+  # the same S1-S4 engine, appends a dated JSON snapshot, and (Mondays)
+  # rolls the last 7 days up into a markdown digest of the lowest-scoring /
+  # pattern-flagged repos. Separate container from scan-cron (different
+  # data source, different cadence for the digest step) but shares the
+  # same repovet_data volume so results are inspectable via `docker exec`.
+  trending-cron:
+    build: .
+    container_name: repovet-trending-cron
+    restart: unless-stopped
+    env_file: ./.env
+    volumes:
+      - repovet_data:/data
+    command: ["bash", "scripts/trending_loop.sh"]
+    healthcheck:
+      disable: true
+
   # cloudflared quick tunnel -- pure outbound, no account/domain needed.
   # Exposes app:8080 (mapped to host 8002) at a random *.trycloudflare.com
   # URL. See Server.md for how to read the current URL; it changes if this
