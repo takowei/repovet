@@ -450,6 +450,9 @@ All three secrets come from the environment only — never a literal file
 path in source, never logged. `PORT` (default `8080`) is the only other
 env var it reads.
 
+See `docs/github-app-setup.md` for the exact copy-paste checklist (field
+values, permission levels, event list) for the manual steps below.
+
 ### Manual steps (GitHub-side, not automatable from this sandbox — Root's hands)
 
 1. Create the GitHub App at github.com/settings/apps/new: name, homepage

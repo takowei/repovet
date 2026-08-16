@@ -4,6 +4,19 @@ Developer trust check for GitHub repos before you depend on them — one-shot
 CLI that scores public, re-runnable trust signals with evidence, no LLM in
 the scoring path. Spec: `../research/repovet-mvp-spec-2026-07.md`.
 
+## 狀態（2026-08-16）
+
+Re-verified M5 (GitHub App skeleton) is still fully green — 181 tests pass,
+no drift since 2026-07-21. Added `docs/github-app-setup.md`: a standalone
+copy-paste checklist for Root's manual GitHub-side steps (create App at
+github.com/settings/apps/new with exact field values, permissions,
+subscribed events; collect App ID/private key/webhook secret; wire into
+bongo's `.env`; install on a test repo; later Marketplace listing). The
+webhook server is already deployed and running on bongo
+(`docker-compose.bongo.yml`, service `app`) behind a cloudflared quick
+tunnel — the only remaining gap is the account-level App creation itself,
+which only Root can do.
+
 ## 狀態（2026-07-21）
 
 M5 done: GitHub App skeleton for Marketplace listing (stage 1, free-tier
