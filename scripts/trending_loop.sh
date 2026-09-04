@@ -27,9 +27,15 @@ while true; do
         today="$(date -u '+%Y-%m-%d')"
         if [ ! -f "${DIGESTS_DIR}/${today}.md" ]; then
             echo "[trending_loop] Monday -- generating weekly digest..."
-            python leaderboard/generate_weekly_digest.py \
-                --scans-dir "$SCANS_DIR" --output-dir "$DIGESTS_DIR" || \
+            if python leaderboard/generate_weekly_digest.py \
+                --scans-dir "$SCANS_DIR" --output-dir "$DIGESTS_DIR"; then
+                echo "[trending_loop] publishing digest to GitHub Pages..."
+                python leaderboard/publish_digest.py \
+                    --digest-file "${DIGESTS_DIR}/${today}.md" || \
+                    echo "[trending_loop] publish_digest exited non-zero -- digest was generated but NOT published, see log above" >&2
+            else
                 echo "[trending_loop] generate_weekly_digest exited non-zero" >&2
+            fi
         fi
     fi
 
