@@ -11,6 +11,43 @@ cloudflared quick tunnel).
 (creating an App is tied to a GitHub account/org and can't be done from a
 sandboxed agent). This doc is the copy-paste checklist for that.
 
+## ⚡ 2026-09-05 實查：現況與縮短後的步驟
+
+Everything below was verified live on bongo and from the public internet on
+2026-09-05, so most of the fiddly parts are already settled:
+
+| 項目 | 實查結果 |
+| --- | --- |
+| **Webhook URL（現行）** | **`https://ministries-foster-duty-offerings.trycloudflare.com/webhook`** — 實測 `POST` 回 **401**（＝簽章驗證正在運作，伺服器活著）、`GET /health` 回 `{"status": "ok"}`。⚠️ 這是 quick tunnel，**容器重啟就會換**。 |
+| **Webhook secret** | ✅ **伺服器上已經有了**（`~/docker/Repovet/app/.env` 的 `REPOVET_WEBHOOK_SECRET`，64 hex＝`openssl rand -hex 32` 的長度）。**不要重新產生**——重生會讓兩邊不一致。 |
+| **App ID / private key** | ❌ 還是 11 字元的**佔位符**，不是真值。**這兩個就是唯一缺的東西。** |
+| **伺服器容器** | `repovet-app` / `repovet-scan-cron` / `repovet-trending-cron` / `repovet-tunnel` 皆 Up 5 days（bongo 25 容器全 Up） |
+| **App 名稱是否被佔用** | `github.com/apps/repovet` 與 `github.com/apps/repovet-trust-check` 皆回 **404**＝兩個名字都還沒被建立、可用 |
+
+**所以實際只剩三步**：
+
+1. 到 <https://github.com/settings/apps/new> 建 App，Webhook URL 填上面那個，
+   Webhook secret 欄位貼**伺服器上已存在的那組**——在 bongo 上讀出來：
+   ```bash
+   grep '^REPOVET_WEBHOOK_SECRET=' ~/docker/Repovet/app/.env
+   ```
+   權限與事件訂閱照下面第 1 節的表。
+2. 建完後在 App 設定頁拿 **App ID**、按 **Generate a private key** 下載 `.pem`。
+3. 把這兩個值寫回 `~/docker/Repovet/app/.env`（覆蓋 `REPOVET_APP_ID` 與
+   `REPOVET_APP_PRIVATE_KEY` 那兩行的佔位符），然後
+   `docker compose -f ~/docker/Repovet/docker-compose.yml up -d --force-recreate app`。
+
+> 🔴 **設計上的隱憂，建 App 前先知道**：現在的 Webhook URL 是 cloudflared
+> **quick tunnel**，網址在 `repovet-tunnel` 容器每次重啟時都會變，而 GitHub App 的
+> Payload URL 是寫死在 App 設定裡的——**容器一重啟，webhook 就靜默失效**。
+> 這不是「以後再說」的問題，是這個 App 的地基。兩個修法：
+> ① 部署 `cloudflare-worker/`（本 repo 內，免費 `*.workers.dev` 是**固定網址**，
+>    不需要買網域；需要 Root 跑一次互動式 `npx wrangler login`），把 Worker 當
+>    穩定入口再轉發到 bongo；② 用 Cloudflare **named tunnel**（需 Cloudflare 帳號）。
+> 兩者都比「每次重啟就回 GitHub 改設定」實際。
+
+---
+
 ## 1. Create the App
 
 Go to <https://github.com/settings/apps/new> and fill in:
