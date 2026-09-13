@@ -2,6 +2,12 @@
 
 Developer trust check for GitHub repos before you depend on them.
 
+The question behind this tool comes up in a lot of my other work, too: a
+trading signal, an agent's benchmark score, a GitHub repo you're about to add
+as a dependency — how do you know a result is as good as it looks before you
+commit to it. Here that question is applied to open-source dependency
+selection instead of taking a star count or a README's word for it.
+
 `repovet` runs a small set of public, re-runnable checks against a GitHub
 repo and reports 0-100 scores **with evidence for every sub-score** — no
 opaque single number, no LLM in the scoring path. Ships four signals now:
