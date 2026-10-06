@@ -33,7 +33,7 @@ Cloudflare Workers free-tier `*.workers.dev` subdomain satisfies that.
 - `worker.js` — the Worker source (no build step, no dependencies)
 - `wrangler.toml` — Cloudflare Workers config (name, compatibility date)
 
-## Deploy (needs Root — requires interactive Cloudflare auth)
+## Deploy (manual — requires interactive Cloudflare auth)
 
 ```bash
 cd cloudflare-worker

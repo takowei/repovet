@@ -1,4 +1,4 @@
-# GitHub App setup — Root's manual checklist
+# GitHub App setup — manual checklist
 
 Everything code-side is already built and tested (`src/repovet/app_server.py`,
 `app_webhook.py`, `app_auth.py`, `webhook_security.py`, `plan_store.py`, all
@@ -7,7 +7,7 @@ tests green as of this doc). The server is already deployed and running on
 bongo (`docker-compose.bongo.yml`, service `app`, port `8002` behind a
 cloudflared quick tunnel).
 
-**What's left is entirely GitHub-account-level actions only Root can take**
+**What's left is entirely GitHub-account-level actions only the account owner can take**
 (creating an App is tied to a GitHub account/org and can't be done from a
 sandboxed agent). This doc is the copy-paste checklist for that.
 
@@ -42,7 +42,7 @@ Everything below was verified live on bongo and from the public internet on
 > Payload URL 是寫死在 App 設定裡的——**容器一重啟，webhook 就靜默失效**。
 > 這不是「以後再說」的問題，是這個 App 的地基。兩個修法：
 > ① 部署 `cloudflare-worker/`（本 repo 內，免費 `*.workers.dev` 是**固定網址**，
->    不需要買網域；需要 Root 跑一次互動式 `npx wrangler login`），把 Worker 當
+>    不需要買網域；需要手動跑一次互動式 `npx wrangler login`），把 Worker 當
 >    穩定入口再轉發到 bongo；② 用 Cloudflare **named tunnel**（需 Cloudflare 帳號）。
 > 兩者都比「每次重啟就回 GitHub 改設定」實際。
 
@@ -139,7 +139,7 @@ confirm repovet posts a scan comment automatically, matching the existing
 
 ## 5. (Later, not now) List on GitHub Marketplace
 
-Only after the App has been running stably for a while and Root wants
+Only after the App has been running stably for a while and the maintainer wants
 public distribution:
 
 1. On the App's settings page → "Marketplace" tab → agree to the
@@ -153,7 +153,7 @@ public distribution:
 4. Submit for review. This is a manual review by a real GitHub person —
    community reports ~2-6 weeks turnaround, no published SLA.
 
-## Known limitation to flag to Root before relying on this
+## Known limitation to to know before relying on this
 
 The webhook URL depends on the cloudflared **quick** tunnel, which issues a
 new random URL every time the `tunnel` container restarts — if that
