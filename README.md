@@ -479,7 +479,7 @@ env var it reads.
 See `docs/github-app-setup.md` for the exact copy-paste checklist (field
 values, permission levels, event list) for the manual steps below.
 
-#### Manual steps (GitHub-side, not automatable from this sandbox — Root's hands)
+#### Manual steps (GitHub-side, done manually by the maintainer)
 
 1. Create the GitHub App at github.com/settings/apps/new: name, homepage
    URL, webhook URL (`https://<your-host>/webhook`), webhook secret,
@@ -978,7 +978,7 @@ python3 -m repovet.app_server   # 或：repovet-app-server
 下面手動步驟的確切複製貼上清單（欄位值、權限層級、事件清單）見
 `docs/github-app-setup.md`。
 
-#### 手動步驟（GitHub 端，本沙盒無法自動化——由 Root 親自操作）
+#### 手動步驟（GitHub 端，需由維護者手動操作）
 
 1. 在 github.com/settings/apps/new 建立 GitHub App：名稱、首頁網址、
    webhook 網址（`https://<your-host>/webhook`）、webhook secret、權限
