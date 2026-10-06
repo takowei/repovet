@@ -32,7 +32,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out calling repo (for its watchlist file)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Check watchlist file exists
         id: check
@@ -44,7 +44,7 @@ jobs:
             echo "found=true" >> "$GITHUB_OUTPUT"
           fi
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         if: steps.check.outputs.found == 'true'
         with:
           python-version: "3.11"
