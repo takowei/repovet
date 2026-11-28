@@ -9,3 +9,10 @@ dist/
 # local AI-assistant notes and settings
 CLAUDE.md
 .claude/
+
+# secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key

@@ -61,6 +61,12 @@ footer { margin-top: 2.5rem; font-size: 0.82rem; color: #666;
 """
 
 
+COMMIT_IDENTITY = {
+    "name": "takowei",
+    "email": "186452654+takowei@users.noreply.github.com",
+}
+
+
 class PublishError(RuntimeError):
     """Raised when the GitHub Contents API doesn't behave as expected."""
 
@@ -223,6 +229,8 @@ class GitHubPublisher:
             "message": message,
             "content": base64.b64encode(content.encode("utf-8")).decode("ascii"),
             "branch": self.branch,
+            "author": dict(COMMIT_IDENTITY),
+            "committer": dict(COMMIT_IDENTITY),
         }
         if sha is not None:
             body["sha"] = sha

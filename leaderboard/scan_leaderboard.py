@@ -12,7 +12,7 @@ TTL cache, not a source of truth). Safe to invoke from a future scheduler
 without any manual step.
 
 Usage:
-    source <local-token-file> && export GITHUB_TOKEN
+    export GITHUB_TOKEN=<your-github-token>
     PYTHONPATH=../src python3 scan_leaderboard.py
 """
 

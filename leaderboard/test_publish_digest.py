@@ -4,7 +4,12 @@ is exercised manually against the real API (see trending-cron rollout
 notes), matching this repo's convention of not mocking requests for thin
 network wrappers (c.f. fetch_trending_repos)."""
 
-from publish_digest import markdown_to_html_body, render_digest_page, render_index_html
+from publish_digest import (
+    GitHubPublisher,
+    markdown_to_html_body,
+    render_digest_page,
+    render_index_html,
+)
 
 
 def test_markdown_to_html_body_renders_headings():
@@ -60,3 +65,29 @@ def test_render_index_html_dedupes_dates():
 def test_render_index_html_handles_empty_list():
     out = render_index_html([])
     assert "No digests published yet" in out
+
+
+class _FakeResponse:
+    status_code = 201
+    text = ""
+
+
+class _RecordingSession:
+    def __init__(self):
+        self.body = None
+
+    def put(self, url, headers=None, json=None, timeout=None):
+        self.body = json
+        return _FakeResponse()
+
+
+def test_put_file_sets_noreply_author_and_committer():
+    session = _RecordingSession()
+    publisher = GitHubPublisher("takowei/repovet", "tok", session=session)
+    publisher.put_file("docs/x.html", "hi", "msg", None)
+    expected = {
+        "name": "takowei",
+        "email": "186452654+takowei@users.noreply.github.com",
+    }
+    assert session.body["author"] == expected
+    assert session.body["committer"] == expected

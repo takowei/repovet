@@ -9,7 +9,7 @@ digest by generate_weekly_digest.py. Never overwrites a previous day's file
 same idempotency posture as the rest of repovet's scan scripts).
 
 Usage:
-    source <local-token-file> && export GITHUB_TOKEN
+    export GITHUB_TOKEN=<your-github-token>
     PYTHONPATH=../src python3 scan_trending.py
 """
 
